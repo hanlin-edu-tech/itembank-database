@@ -5,14 +5,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
-[Description("使用者類型值")]
+[Description("題型")]
 public sealed class UserTypeValue : IAuditable
 {
     [BsonId]
     [Description("Id")]
     public required UserTypeValueId Id { get; init; }
 
-    [Description("使用者類型 Id")]
+    [Description("題型表 Id")]
     public required UserTypeId UserTypeId { get; init; }
 
     [Description("名稱")]
@@ -21,7 +21,7 @@ public sealed class UserTypeValue : IAuditable
     [Description("分組名稱")]
     public required string GroupingName { get; init; }
 
-    [Description("答題方式")]
+    [Description("作答方式")]
     public required string? AnsweringMethod { get; init; }
 
     [Description("換行次數")]

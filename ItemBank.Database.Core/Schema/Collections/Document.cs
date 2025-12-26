@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
-[Description("文件")]
+[Description("五欄檔案")]
 public class Document
 {
     [BsonId]
@@ -13,7 +13,7 @@ public class Document
     [Description("名稱")]
     public required string Name { get; init; }
 
-    [Description("文件儲存庫 Id")]
+    [Description("五欄檔案儲存庫 Id")]
     public required string DocumentRepoId { get; init; }
 
     [Description("產品章節 Id 清單")]

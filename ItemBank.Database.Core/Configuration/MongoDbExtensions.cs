@@ -1,4 +1,5 @@
 using ItemBank.Database.Core.Configuration.BsonSerializers;
+using ItemBank.Database.Core.Schema.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -60,6 +61,12 @@ public static class MongoDbExtensions
         BsonSerializer.RegisterSerializer(new CatalogGroupIdSerializer());
         BsonSerializer.RegisterSerializer(new UserIdSerializer());
         BsonSerializer.RegisterSerializer(new UserTypeIdSerializer());
+        BsonSerializer.RegisterSerializer(new TaskIdSerializer());
+        BsonSerializer.RegisterSerializer(new RepositoryIdSerializer());
+        BsonSerializer.RegisterSerializer(new DocumentIdSerializer());
+
+        // 註冊 Enum Serializer
+        BsonSerializer.RegisterSerializer(new CamelCaseEnumStringSerializer<DimensionType>());
 
         var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
         ConventionRegistry.Register("CamelCase", conventionPack, _ => true);

@@ -4,24 +4,24 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
-[Description("文件項目")]
+[Description("五欄檔案題目")]
 public class DocumentItem
 {
     [BsonId]
     [Description("Id")]
     public required DocumentItemId Id { get; init; }
 
-    [Description("文件 Id")]
+    [Description("五欄檔案 Id")]
     public required string DocumentId { get; init; }
 
-    [Description("項目 Id")]
+    [Description("題目 Id")]
     public required string ItemId { get; init; }
 
     [Description("元資料清單")]
     public List<DocumentItemMetadata> MetadataList { get; init; } = [];
 }
 
-[Description("文件項目元資料")]
+[Description("五欄檔案題目元資料")]
 public class DocumentItemMetadata
 {
     [Description("元資料值 Id")]

@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
-[Description("項目")]
+[Description("題目")]
 public class Item
 {
     [BsonId]
@@ -15,7 +15,7 @@ public class Item
     public List<ItemResourceLink> ResourceLinks { get; init; } = [];
 }
 
-[Description("項目資源連結")]
+[Description("題目資源連結")]
 public class ItemResourceLink
 {
     [Description("名稱")]

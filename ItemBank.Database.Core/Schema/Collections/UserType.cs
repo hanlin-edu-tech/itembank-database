@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
-[Description("使用者類型")]
+[Description("題型表")]
 public class UserType : IFinalizable, IAuditable
 {
     [BsonId]

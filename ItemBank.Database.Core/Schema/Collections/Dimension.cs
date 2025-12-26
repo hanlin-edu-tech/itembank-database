@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Enums;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization;
@@ -15,7 +16,7 @@ public sealed class Dimension : IFinalizable, IAuditable
     public required DimensionId Id { get; init; }
 
     [Description("類型")]
-    public required string Type { get; init; }
+    public required DimensionType Type { get; init; }
 
     [Description("名稱")]
     public required string Name { get; init; }
