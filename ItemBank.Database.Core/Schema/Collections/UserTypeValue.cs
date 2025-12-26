@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Interfaces;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -9,10 +10,10 @@ public sealed class UserTypeValue : IAuditable
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required UserTypeValueId Id { get; init; }
 
     [Description("使用者類型 Id")]
-    public required string UserTypeId { get; init; }
+    public required UserTypeId UserTypeId { get; init; }
 
     [Description("名稱")]
     public required string Name { get; init; }
@@ -36,13 +37,13 @@ public sealed class UserTypeValue : IAuditable
     public required int OrderIndex { get; init; }
 
     [Description("建立者")]
-    public required string CreatedBy { get; init; }
+    public required UserId CreatedBy { get; init; }
 
     [Description("建立時間")]
     public required DateTime CreatedOn { get; init; }
 
     [Description("更新者")]
-    public required string UpdatedBy { get; init; }
+    public required UserId UpdatedBy { get; init; }
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }

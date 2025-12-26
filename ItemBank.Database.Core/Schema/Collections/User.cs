@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -8,8 +9,8 @@ public class User
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; set; }
+    public required UserId Id { get; init; }
 
     [Description("名稱")]
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 }

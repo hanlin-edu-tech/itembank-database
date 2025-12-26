@@ -1,3 +1,5 @@
+using ItemBank.Database.Core.Schema.ValueObjects;
+
 namespace ItemBank.Database.Core.Schema.Interfaces;
 
 /// <summary>
@@ -6,13 +8,13 @@ namespace ItemBank.Database.Core.Schema.Interfaces;
 public interface IAuditable
 {
     /// <summary>Gets the user who created this entity.</summary>
-    string CreatedBy { get; }
+    UserId CreatedBy { get; }
 
     /// <summary>Gets the date when this entity was created.</summary>
     DateTime CreatedOn { get; }
 
     /// <summary>Gets the user who last updated this entity.</summary>
-    string UpdatedBy { get; }
+    UserId UpdatedBy { get; }
 
     /// <summary>Gets the date when this entity was last updated.</summary>
     DateTime UpdatedOn { get; }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Interfaces;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -10,22 +11,22 @@ public class ProductContent : IFinalizable, IAuditable
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required ProductContentId Id { get; init; }
 
     [Description("是否已鎖定")]
-    public bool IsFinalized { get; set; }
+    public bool IsFinalized { get; init; }
 
     [Description("鎖定時間")]
-    public DateTime? FinalizedOn { get; set; }
+    public DateTime? FinalizedOn { get; init; }
 
     [Description("版本")]
-    public int Revision { get; set; }
+    public int Revision { get; init; }
 
     [Description("產品 Id")]
-    public required string ProductId { get; init; }
+    public required ProductId ProductId { get; init; }
 
     [Description("科目 Id")]
-    public required string SubjectId { get; init; }
+    public required SubjectId SubjectId { get; init; }
 
     [Description("學年")]
     public required int Year { get; init; }
@@ -37,13 +38,13 @@ public class ProductContent : IFinalizable, IAuditable
     public required string Name { get; init; }
 
     [Description("版本 Id")]
-    public required string VersionId { get; init; }
+    public required VersionId VersionId { get; init; }
 
     [Description("部門")]
     public required string Department { get; init; }
 
     [Description("編輯者")]
-    public required string Editor { get; init; }
+    public required UserId Editor { get; init; }
 
     [Description("預期鎖定日期")]
     public required DateTime ExpectedLockDate { get; init; }
@@ -55,19 +56,19 @@ public class ProductContent : IFinalizable, IAuditable
     public required string? Prerequisite { get; init; }
 
     [Description("學程 Id")]
-    public required string? BodyOfKnowledgeId { get; init; }
+    public required BodyOfKnowledgeId? BodyOfKnowledgeId { get; init; }
 
     [Description("是否啟用")]
     public required bool Enabled { get; init; }
 
     [Description("建立者")]
-    public required string CreatedBy { get; init; }
+    public required UserId CreatedBy { get; init; }
 
     [Description("建立時間")]
     public required DateTime CreatedOn { get; init; }
 
     [Description("更新者")]
-    public required string UpdatedBy { get; init; }
+    public required UserId UpdatedBy { get; init; }
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }

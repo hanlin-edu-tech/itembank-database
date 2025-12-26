@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Interfaces;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -9,7 +10,7 @@ public class DimensionValue : IAuditable
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required DimensionValueId Id { get; init; }
 
     [Description("向度資訊表 Id")]
     public required string DimensionId { get; init; }
@@ -24,10 +25,10 @@ public class DimensionValue : IAuditable
     public required string Name { get; init; }
 
     [Description("路徑")]
-    public required List<string> Path { get; init; }
+    public required List<DimensionValueId> Path { get; init; }
 
     [Description("作者")]
-    public required string Author { get; init; }
+    public required UserId Author { get; init; }
 
     [Description("描述")]
     public required string Description { get; init; }
@@ -48,16 +49,16 @@ public class DimensionValue : IAuditable
     public required int Depth { get; init; }
 
     [Description("上層 Id")]
-    public required string? ParentId { get; init; }
+    public required DimensionValueId? ParentId { get; init; }
 
     [Description("建立者")]
-    public required string CreatedBy { get; init; }
+    public required UserId CreatedBy { get; init; }
 
     [Description("建立時間")]
     public required DateTime CreatedOn { get; init; }
 
     [Description("更新者")]
-    public required string UpdatedBy { get; init; }
+    public required UserId UpdatedBy { get; init; }
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }

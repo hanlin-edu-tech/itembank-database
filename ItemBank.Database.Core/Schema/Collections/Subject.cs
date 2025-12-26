@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -8,13 +9,13 @@ public sealed class Subject
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required SubjectId Id { get; init; }
 
     [Description("名稱")]
     public required string Name { get; init; }
 
     [Description("父科目 Id")]
-    public required string? ParentSubjectId { get; init; }
+    public required SubjectId? ParentSubjectId { get; init; }
 
     [Description("教育代碼")]
     public required string EducationCode { get; init; }

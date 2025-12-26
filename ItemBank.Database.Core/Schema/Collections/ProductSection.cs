@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Interfaces;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -9,7 +10,7 @@ public class ProductSection : IAuditable
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required ProductSectionId Id { get; init; }
 
     [Description("產品內容 Id")]
     public required string ProductContentId { get; init; }
@@ -33,7 +34,7 @@ public class ProductSection : IAuditable
     public required List<string> DocumentIds { get; init; }
 
     [Description("向度資訊 Id 清單")]
-    public required List<string> DimensionValueIds { get; init; }
+    public required List<DimensionValueId> DimensionValueIds { get; init; }
 
     [Description("是否可見")]
     public required bool IsVisible { get; init; }
@@ -45,19 +46,19 @@ public class ProductSection : IAuditable
     public required bool IsCollapsible { get; init; }
 
     [Description("路徑")]
-    public required List<string> Path { get; init; }
+    public required List<ProductSectionId> Path { get; init; }
 
     [Description("排序索引")]
     public required int OrderIndex { get; init; }
 
     [Description("建立者")]
-    public required string CreatedBy { get; init; }
+    public required UserId CreatedBy { get; init; }
 
     [Description("建立時間")]
     public required DateTime CreatedOn { get; init; }
 
     [Description("更新者")]
-    public required string UpdatedBy { get; init; }
+    public required UserId UpdatedBy { get; init; }
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }

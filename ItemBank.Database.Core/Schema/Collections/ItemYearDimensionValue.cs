@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -8,7 +9,7 @@ public class ItemYearDimensionValue
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required ItemYearDimensionValueId Id { get; init; }
 
     [Description("向度資訊 Id")]
     public required string DimensionValueId { get; init; }

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -8,13 +9,13 @@ public class BodyOfKnowledge
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required BodyOfKnowledgeId Id { get; init; }
 
     [Description("代碼")]
     public required string Code { get; init; }
 
     [Description("科目Id")]
-    public required string SubjectId { get; init; }
+    public required SubjectId SubjectId { get; init; }
 
     [Description("學年")]
     public required int Year { get; init; }
@@ -26,5 +27,5 @@ public class BodyOfKnowledge
     public required string Name { get; init; }
 
     [Description("向度資訊表的 Id 列表")]
-    public required IEnumerable<string> DimensionIds { get; init; }
+    public required IReadOnlyList<DimensionId> DimensionIds { get; init; }
 }

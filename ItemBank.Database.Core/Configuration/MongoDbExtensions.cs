@@ -1,5 +1,6 @@
+using ItemBank.Database.Core.Configuration.BsonSerializers;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
 namespace ItemBank.Database.Core.Configuration;
@@ -38,6 +39,28 @@ public static class MongoDbExtensions
 
     private static void RegisterSerializers()
     {
+        // 註冊所有值物件序列化器
+        BsonSerializer.RegisterSerializer(new SubjectIdSerializer());
+        BsonSerializer.RegisterSerializer(new ProductIdSerializer());
+        BsonSerializer.RegisterSerializer(new ProductContentIdSerializer());
+        BsonSerializer.RegisterSerializer(new ProductSectionIdSerializer());
+        BsonSerializer.RegisterSerializer(new DimensionIdSerializer());
+        BsonSerializer.RegisterSerializer(new DimensionValueIdSerializer());
+        BsonSerializer.RegisterSerializer(new VolumeIdSerializer());
+        BsonSerializer.RegisterSerializer(new SourceIdSerializer());
+        BsonSerializer.RegisterSerializer(new SourceValueIdSerializer());
+        BsonSerializer.RegisterSerializer(new TextbookContentIdSerializer());
+        BsonSerializer.RegisterSerializer(new TextbookSectionIdSerializer());
+        BsonSerializer.RegisterSerializer(new UserTypeValueIdSerializer());
+        BsonSerializer.RegisterSerializer(new ItemYearDimensionValueIdSerializer());
+        BsonSerializer.RegisterSerializer(new DocumentItemIdSerializer());
+        BsonSerializer.RegisterSerializer(new ItemIdSerializer());
+        BsonSerializer.RegisterSerializer(new BodyOfKnowledgeIdSerializer());
+        BsonSerializer.RegisterSerializer(new VersionIdSerializer());
+        BsonSerializer.RegisterSerializer(new CatalogGroupIdSerializer());
+        BsonSerializer.RegisterSerializer(new UserIdSerializer());
+        BsonSerializer.RegisterSerializer(new UserTypeIdSerializer());
+
         var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
         ConventionRegistry.Register("CamelCase", conventionPack, _ => true);
         var pack = new ConventionPack { new IgnoreExtraElementsConvention(true) };
@@ -46,60 +69,5 @@ public static class MongoDbExtensions
             pack,
             t => t.FullName?.StartsWith("ItemBank.Database.Core.Schema.Collections") is true
         );
-    }
-}
-
-/// <summary>
-/// MongoDbContextOptions 的建構器
-/// </summary>
-public sealed class MongoDbContextOptionsBuilder
-{
-    private MongoClientSettings? _clientSettings;
-    private string? _databaseName;
-    private bool _autoCreateIndexes;
-
-    /// <summary>
-    /// 設定 MongoDB 客戶端設定
-    /// </summary>
-    public MongoDbContextOptionsBuilder WithClientSettings(MongoClientSettings settings)
-    {
-        _clientSettings = settings;
-        return this;
-    }
-
-    /// <summary>
-    /// 設定 MongoDB 資料庫名稱
-    /// </summary>
-    public MongoDbContextOptionsBuilder WithDatabaseName(string databaseName)
-    {
-        _databaseName = databaseName;
-        return this;
-    }
-
-    /// <summary>
-    /// 設定是否自動建立索引
-    /// </summary>
-    public MongoDbContextOptionsBuilder WithAutoCreateIndexes(bool enabled = true)
-    {
-        _autoCreateIndexes = enabled;
-        return this;
-    }
-
-    /// <summary>
-    /// 建構 MongoDbContextOptions
-    /// </summary>
-    public MongoDbContextOptions Build()
-    {
-        if (_clientSettings == null)
-            throw new InvalidOperationException("MongoClientSettings 必須被設定");
-        if (string.IsNullOrEmpty(_databaseName))
-            throw new InvalidOperationException("DatabaseName 必須被設定");
-
-        return new MongoDbContextOptions
-        {
-            ClientSettings = _clientSettings,
-            DatabaseName = _databaseName,
-            AutoCreateIndexes = _autoCreateIndexes
-        };
     }
 }

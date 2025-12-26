@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
@@ -8,10 +9,10 @@ public class Volume
 {
     [BsonId]
     [Description("Id")]
-    public required string Id { get; init; }
+    public required VolumeId Id { get; init; }
 
     [Description("科目 Id")]
-    public required string SubjectId { get; init; }
+    public required SubjectId SubjectId { get; init; }
 
     [Description("名稱")]
     public required string Name { get; init; }
@@ -23,5 +24,5 @@ public class Volume
     public required int Year { get; init; }
 
     [Description("學程 Id")]
-    public required string BodyOfKnowledgeId { get; init; }
+    public required BodyOfKnowledgeId BodyOfKnowledgeId { get; init; }
 }
