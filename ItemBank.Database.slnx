@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ItemBank.Database.Core/ItemBank.Database.Core.csproj" />
+  <Project Path="ItemBank.Database.Tools/ItemBank.Database.Tools.csproj" />
+</Solution>
