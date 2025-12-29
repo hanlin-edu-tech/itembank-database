@@ -1,10 +1,12 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("SourceValues")]
 [Description("出處")]
 public sealed class SourceValue : IAuditable
 {
@@ -38,4 +40,8 @@ public sealed class SourceValue : IAuditable
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }
+    
+    [Obsolete("已棄用，過去用於追蹤版本的名稱")]
+    [BsonIgnoreIfNull]
+    public string? LastVersionedName { get; init; }
 }

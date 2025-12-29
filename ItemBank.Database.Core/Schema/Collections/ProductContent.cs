@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Enums;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
@@ -6,6 +8,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("ProductContents")]
 [Description("產品內容")]
 public class ProductContent : IFinalizable, IAuditable
 {
@@ -72,19 +75,4 @@ public class ProductContent : IFinalizable, IAuditable
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }
-}
-
-[Description("期別列舉")]
-public enum TermEnum
-{
-    上期,
-    下期
-}
-
-[Description("學期列舉")]
-public enum SemesterEnum
-{
-    上學期,
-    下學期,
-    全部適用
 }

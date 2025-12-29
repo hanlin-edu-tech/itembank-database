@@ -1,10 +1,12 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("ProductSections")]
 [Description("產品章節")]
 public class ProductSection : IAuditable
 {

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
@@ -6,6 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("ImportTasks")]
 [Description("匯入任務")]
 public class ImportTask
 {

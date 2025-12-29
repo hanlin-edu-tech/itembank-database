@@ -1,10 +1,12 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("Announcements")]
 [Description("公告")]
 public sealed class Announcement
 {

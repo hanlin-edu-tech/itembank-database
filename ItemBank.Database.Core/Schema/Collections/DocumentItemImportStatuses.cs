@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
@@ -7,8 +8,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("DocumentItemImportStatuses")]
 [Description("五欄檔案題目匯入狀態檢視")]
-public sealed class DocumentItemImportStatusesView
+public sealed class DocumentItemImportStatuses
 {
     [BsonId]
     [Description("複合鍵")]

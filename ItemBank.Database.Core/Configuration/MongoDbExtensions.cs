@@ -64,9 +64,30 @@ public static class MongoDbExtensions
         BsonSerializer.RegisterSerializer(new TaskIdSerializer());
         BsonSerializer.RegisterSerializer(new RepositoryIdSerializer());
         BsonSerializer.RegisterSerializer(new DocumentIdSerializer());
+        BsonSerializer.RegisterSerializer(new CatalogIdSerializer());
+        BsonSerializer.RegisterSerializer(new DifficultyIdSerializer());
+        BsonSerializer.RegisterSerializer(new DocumentRepoIdSerializer());
+        BsonSerializer.RegisterSerializer(new DuplicateDetectionRecordIdSerializer());
+        BsonSerializer.RegisterSerializer(new ExportTaskIdSerializer());
+        BsonSerializer.RegisterSerializer(new ItemIssueIdSerializer());
+        BsonSerializer.RegisterSerializer(new ItemMergeHistoryIdSerializer());
+        BsonSerializer.RegisterSerializer(new UserConversationIdSerializer());
+        BsonSerializer.RegisterSerializer(new ConversationMessageIdSerializer());
+        BsonSerializer.RegisterSerializer(new ValidationTargetIdSerializer());
+        BsonSerializer.RegisterSerializer(new PackageIdSerializer());
 
         // 註冊 Enum Serializer
-        BsonSerializer.RegisterSerializer(new CamelCaseEnumStringSerializer<DimensionType>());
+        BsonSerializer.RegisterSerializer(new EnumSerializer<DimensionType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ExportType>(EnumSerializationType.PascalCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ExportArchiveMode>(EnumSerializationType.PascalCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<BatchProcessingStatus>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ConversationRole>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<MetadataType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ProcessingType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<CopyrightType>(EnumSerializationType.Integer));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<UsageType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<TermEnum>(EnumSerializationType.PascalCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<SemesterEnum>(EnumSerializationType.PascalCase));
 
         var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
         ConventionRegistry.Register("CamelCase", conventionPack, _ => true);

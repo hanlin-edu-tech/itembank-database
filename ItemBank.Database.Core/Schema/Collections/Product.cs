@@ -1,9 +1,11 @@
 using System.ComponentModel;
+using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
+[CollectionName("Products")]
 [Description("產品")]
 public sealed class Product
 {

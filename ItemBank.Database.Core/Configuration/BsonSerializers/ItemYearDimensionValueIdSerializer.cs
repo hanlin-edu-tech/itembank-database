@@ -16,8 +16,8 @@ public class ItemYearDimensionValueIdSerializer : NullableClassSerializerBase<It
     /// </summary>
     protected override ItemYearDimensionValueId DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args, BsonType bsonType)
     {
-        if (bsonType == BsonType.String)
-            return new ItemYearDimensionValueId(context.Reader.ReadString());
+        if (bsonType == BsonType.ObjectId)
+            return new ItemYearDimensionValueId(context.Reader.ReadObjectId().ToString());
         throw new BsonSerializationException($"無法從 {bsonType} 反序列化 ItemYearDimensionValueId");
     }
 
@@ -26,6 +26,6 @@ public class ItemYearDimensionValueIdSerializer : NullableClassSerializerBase<It
     /// </summary>
     protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, ItemYearDimensionValueId value)
     {
-        context.Writer.WriteString(value.Value);
+        context.Writer.WriteObjectId(new ObjectId(value.Value));
     }
 }
