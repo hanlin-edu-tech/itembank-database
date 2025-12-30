@@ -28,7 +28,6 @@ public sealed class DbContext(MongoDbContextOptions options)
         var attribute = type.GetCustomAttribute<CollectionNameAttribute>();
 
         return attribute != null ? attribute.Name :
-            // 預設使用類名作為集合名稱
-            type.Name;
+            throw new InvalidOperationException($"類型 {type.FullName} 未標註 {nameof(CollectionNameAttribute)} 屬性。");
     }
 }

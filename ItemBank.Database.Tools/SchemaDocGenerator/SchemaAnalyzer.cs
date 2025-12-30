@@ -1,0 +1,152 @@
+using System.ComponentModel;
+using System.Reflection;
+using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Interfaces;
+using ItemBank.Database.Tools.SchemaDocGenerator.Models;
+using ItemBank.Database.Tools.SchemaDocGenerator.TypeMappers;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace ItemBank.Database.Tools.SchemaDocGenerator;
+
+/// <summary>
+/// Schema 分析器 - 掃描並分析所有集合類別
+/// </summary>
+public sealed class SchemaAnalyzer
+{
+    private readonly MongoTypeMapper _typeMapper = new();
+
+    private readonly Dictionary<string, Dictionary<string, string>> _globalEnums = new();
+
+    /// <summary>
+    /// 分析所有集合定義
+    /// </summary>
+    /// <returns>Schema 文件（包含全局 Enum 和集合清單）</returns>
+    public SchemaDocument AnalyzeCollections()
+    {
+        // 載入 ItemBank.Database.Core 組件
+        var coreAssembly = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(a => a.GetName().Name == "ItemBank.Database.Core");
+
+        if (coreAssembly == null)
+            throw new InvalidOperationException("找不到 ItemBank.Database.Core 組件");
+
+        // 掃描所有帶有 [CollectionName] 的類別
+        var collectionTypes = coreAssembly.GetTypes()
+            .Where(t => t.GetCustomAttribute<CollectionNameAttribute>() != null)
+            .OrderBy(t => t.Name)
+            .ToList();
+
+        var schemas = new List<CollectionSchema>();
+        _globalEnums.Clear();
+
+        foreach (var collectionType in collectionTypes)
+        {
+            var schema = AnalyzeCollection(collectionType);
+            schemas.Add(schema);
+        }
+
+        return new SchemaDocument
+        {
+            Enums = _globalEnums.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (IReadOnlyDictionary<string, string>)kvp.Value
+            ),
+            Collections = schemas
+        };
+    }
+
+    /// <summary>
+    /// 分析單一集合類別
+    /// </summary>
+    private CollectionSchema AnalyzeCollection(Type collectionType)
+    {
+        var collectionNameAttr = collectionType.GetCustomAttribute<CollectionNameAttribute>()!;
+        var descriptionAttr = collectionType.GetCustomAttribute<DescriptionAttribute>();
+
+        var fields = new Dictionary<string, FieldSchema>();
+        var primaryKeys = new List<string>();
+
+        // 分析所有 public properties
+        foreach (var property in collectionType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            var fieldSchema = AnalyzeField(property);
+            fields[property.Name] = fieldSchema;
+
+            // 識別主鍵
+            if (property.GetCustomAttribute<BsonIdAttribute>() != null)
+            {
+                primaryKeys.Add(property.Name);
+            }
+        }
+
+        return new CollectionSchema
+        {
+            CollectionName = collectionNameAttr.Name,
+            Description = descriptionAttr?.Description ?? "",
+            ClrTypeName = collectionType.Name,
+            IsAuditable = typeof(IAuditable).IsAssignableFrom(collectionType),
+            IsFinalizable = typeof(IFinalizable).IsAssignableFrom(collectionType),
+            PrimaryKeys = primaryKeys,
+            BusinessKeys = Array.Empty<string>(), // 暫時留空
+            Fields = fields
+        };
+    }
+
+    /// <summary>
+    /// 分析欄位
+    /// </summary>
+    private FieldSchema AnalyzeField(PropertyInfo property)
+    {
+        var description = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
+        var type = _typeMapper.MapType(property.PropertyType, out var nestedFields, out var enumValues, out var idType, out var enumType);
+
+        // 如果有 enum 值，加入全局 enum 字典
+        if (enumValues != null && enumType != null)
+        {
+            if (!_globalEnums.ContainsKey(enumType))
+            {
+                _globalEnums[enumType] = enumValues;
+            }
+        }
+
+        // 遞迴處理嵌套欄位中的 enum
+        if (nestedFields != null)
+        {
+            CollectEnumsFromFields(nestedFields);
+        }
+
+        return new FieldSchema
+        {
+            Type = type,
+            Description = description,
+            IdType = idType,
+            EnumType = enumType,
+            Fields = nestedFields,
+            EnumValues = null // 不再在欄位中儲存 enum 值
+        };
+    }
+
+    /// <summary>
+    /// 從欄位字典中遞迴收集所有 enum 定義
+    /// </summary>
+    private void CollectEnumsFromFields(Dictionary<string, FieldSchema> fields)
+    {
+        foreach (var field in fields.Values)
+        {
+            // 檢查此欄位是否為 enum
+            if (field.EnumValues != null && field.EnumType != null)
+            {
+                if (!_globalEnums.ContainsKey(field.EnumType))
+                {
+                    _globalEnums[field.EnumType] = new Dictionary<string, string>(field.EnumValues);
+                }
+            }
+
+            // 遞迴處理嵌套欄位
+            if (field.Fields != null)
+            {
+                CollectEnumsFromFields((Dictionary<string, FieldSchema>)field.Fields);
+            }
+        }
+    }
+}

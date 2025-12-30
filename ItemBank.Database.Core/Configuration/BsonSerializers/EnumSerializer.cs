@@ -84,4 +84,23 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
 
         return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
     }
+
+    /// <summary>
+    /// 取得序列化類型
+    /// </summary>
+    public EnumSerializationType SerializationType => serializationType;
+
+    /// <summary>
+    /// 取得 Enum 值序列化後的字串形式
+    /// </summary>
+    public string GetSerializedValue(TEnum value)
+    {
+        return serializationType switch
+        {
+            EnumSerializationType.Integer => Convert.ToInt32(value).ToString(),
+            EnumSerializationType.CamelCase => ToCamelCase(value.ToString()),
+            EnumSerializationType.PascalCase => value.ToString(),
+            _ => value.ToString()
+        };
+    }
 }
