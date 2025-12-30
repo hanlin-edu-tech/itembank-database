@@ -1,5 +1,7 @@
 using ItemBank.Database.Core.Configuration.BsonSerializers;
+using ItemBank.Database.Core.Configuration.BsonSerializers.Abstractions;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -40,41 +42,43 @@ public static class MongoDbExtensions
 
     private static void RegisterSerializers()
     {
-        // 註冊所有值物件序列化器
-        BsonSerializer.RegisterSerializer(new SubjectIdSerializer());
-        BsonSerializer.RegisterSerializer(new ProductIdSerializer());
-        BsonSerializer.RegisterSerializer(new ProductContentIdSerializer());
-        BsonSerializer.RegisterSerializer(new ProductSectionIdSerializer());
-        BsonSerializer.RegisterSerializer(new DimensionIdSerializer());
-        BsonSerializer.RegisterSerializer(new DimensionValueIdSerializer());
-        BsonSerializer.RegisterSerializer(new VolumeIdSerializer());
-        BsonSerializer.RegisterSerializer(new SourceIdSerializer());
-        BsonSerializer.RegisterSerializer(new SourceValueIdSerializer());
-        BsonSerializer.RegisterSerializer(new TextbookContentIdSerializer());
-        BsonSerializer.RegisterSerializer(new TextbookSectionIdSerializer());
-        BsonSerializer.RegisterSerializer(new UserTypeValueIdSerializer());
-        BsonSerializer.RegisterSerializer(new ItemYearDimensionValueIdSerializer());
-        BsonSerializer.RegisterSerializer(new DocumentItemIdSerializer());
-        BsonSerializer.RegisterSerializer(new ItemIdSerializer());
-        BsonSerializer.RegisterSerializer(new BodyOfKnowledgeIdSerializer());
-        BsonSerializer.RegisterSerializer(new VersionIdSerializer());
-        BsonSerializer.RegisterSerializer(new CatalogGroupIdSerializer());
-        BsonSerializer.RegisterSerializer(new UserIdSerializer());
-        BsonSerializer.RegisterSerializer(new UserTypeIdSerializer());
-        BsonSerializer.RegisterSerializer(new TaskIdSerializer());
-        BsonSerializer.RegisterSerializer(new RepositoryIdSerializer());
-        BsonSerializer.RegisterSerializer(new DocumentIdSerializer());
-        BsonSerializer.RegisterSerializer(new CatalogIdSerializer());
-        BsonSerializer.RegisterSerializer(new DifficultyIdSerializer());
-        BsonSerializer.RegisterSerializer(new DocumentRepoIdSerializer());
-        BsonSerializer.RegisterSerializer(new DuplicateDetectionRecordIdSerializer());
-        BsonSerializer.RegisterSerializer(new ExportTaskIdSerializer());
-        BsonSerializer.RegisterSerializer(new ItemIssueIdSerializer());
-        BsonSerializer.RegisterSerializer(new ItemMergeHistoryIdSerializer());
-        BsonSerializer.RegisterSerializer(new UserConversationIdSerializer());
-        BsonSerializer.RegisterSerializer(new ConversationMessageIdSerializer());
-        BsonSerializer.RegisterSerializer(new ValidationTargetIdSerializer());
-        BsonSerializer.RegisterSerializer(new PackageIdSerializer());
+        // 註冊 String-based Id 序列化器
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<SubjectId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ProductId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ProductContentId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ProductSectionId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DimensionId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DimensionValueId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<VolumeId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<SourceId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<SourceValueId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<TextbookContentId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<TextbookSectionId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<UserTypeValueId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DocumentItemId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ItemId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<BodyOfKnowledgeId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<VersionId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<CatalogGroupId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<UserId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<UserTypeId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<RepositoryId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DocumentId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<CatalogId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DifficultyId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DocumentRepoId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ItemIssueId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ValidationTargetId>());
+
+        // 註冊 ObjectId-based Id 序列化器
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ItemYearDimensionValueId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<TaskId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<DuplicateDetectionRecordId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ExportTaskId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ItemMergeHistoryId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<UserConversationId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ConversationMessageId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<PackageId>());
 
         // 註冊 Enum Serializer
         BsonSerializer.RegisterSerializer(new EnumSerializer<DimensionType>(EnumSerializationType.CamelCase));
