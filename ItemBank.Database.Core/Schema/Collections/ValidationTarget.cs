@@ -31,7 +31,7 @@ public class ValidationTarget
     [Description("排序索引")]
     public required int OrderIndex { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string? Description { get; init; }
 
     [Description("是否封存")]

@@ -9,7 +9,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ProductContents")]
-[Description("產品內容")]
+[Description("產品單元表")]
 public class ProductContent : IFinalizable, IAuditable
 {
     [BsonId]

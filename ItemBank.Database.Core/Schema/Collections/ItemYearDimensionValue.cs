@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemYearDimensionValues")]
-[Description("題目年份維度值")]
+[Description("題目學年向度資訊")]
 public class ItemYearDimensionValue
 {
     [BsonId]
@@ -17,7 +17,7 @@ public class ItemYearDimensionValue
     [Description("學程 Id")]
     public required BodyOfKnowledgeId BodyOfKnowledgeId { get; init; }
 
-    [Description("年度")]
+    [Description("學年")]
     public required int Year { get; init; }
 
     [Description("題目 Id")]

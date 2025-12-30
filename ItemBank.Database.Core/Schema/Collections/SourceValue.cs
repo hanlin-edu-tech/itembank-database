@@ -23,7 +23,7 @@ public sealed class SourceValue : IAuditable
     [Description("版權")]
     public required bool Copyright { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string Description { get; init; }
 
     [Description("排序索引")]

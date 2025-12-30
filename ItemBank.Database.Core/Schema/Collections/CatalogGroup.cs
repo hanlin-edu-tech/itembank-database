@@ -21,7 +21,7 @@ public sealed class CatalogGroup : IAuditable
     [Description("名稱")]
     public required string Name { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string? Description { get; init; }
 
     [Description("建立者")]

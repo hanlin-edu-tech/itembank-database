@@ -67,7 +67,7 @@ public class Document
     [Description("目錄 Id")]
     public required CatalogId CatalogId { get; init; }
 
-    [Description("產品章節 Id 清單")]
+    [Description("產品單元章節 Id 清單")]
     public required IReadOnlyList<ProductSectionId> ProductSectionIds { get; init; }
 
     [Description("年度")]

@@ -33,7 +33,7 @@ public class DimensionValue : IAuditable
     [Description("作者")]
     public required UserId Author { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string Description { get; init; }
 
     [Description("說明")]

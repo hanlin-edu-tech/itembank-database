@@ -29,7 +29,7 @@ public class TextbookSection : IAuditable
     [Description("段考範圍")]
     public required List<string> TermTests { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string Description { get; init; }
 
     [Description("向度資訊 Id 清單")]

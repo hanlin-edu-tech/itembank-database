@@ -7,17 +7,17 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ProductSections")]
-[Description("產品章節")]
+[Description("產品單元章節")]
 public class ProductSection : IAuditable
 {
     [BsonId]
     [Description("Id")]
     public required ProductSectionId Id { get; init; }
 
-    [Description("產品內容 Id")]
+    [Description("產品單元表 Id")]
     public required string ProductContentId { get; init; }
 
-    [Description("冊別")]
+    [Description("冊次")]
     public required string Volume { get; init; }
 
     [Description("代碼")]

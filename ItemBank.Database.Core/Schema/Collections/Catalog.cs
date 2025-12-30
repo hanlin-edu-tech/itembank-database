@@ -46,7 +46,7 @@ public class Catalog
     [Description("是否可設定")]
     public required bool CanConfigure { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public string? Description { get; init; }
 
     [Description("是否為主科")]
@@ -83,6 +83,6 @@ public class CatalogValidationRule
     [Description("排序索引")]
     public required int OrderIndex { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public string? Description { get; init; }
 }

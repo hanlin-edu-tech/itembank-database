@@ -32,7 +32,7 @@ public sealed class UserTypeValue : IAuditable
     [Description("是否應該加上括弧")]
     public required bool ShouldAddBracket { get; init; }
 
-    [Description("描述")]
+    [Description("備註")]
     public required string? Description { get; init; }
 
     [Description("排序索引")]
