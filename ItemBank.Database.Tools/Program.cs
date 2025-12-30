@@ -1,7 +1,18 @@
+using ItemBank.Database.Core.Configuration;
 using ItemBank.Database.Tools.SchemaDocGenerator;
+using Microsoft.Extensions.DependencyInjection;
 
 // ItemBank Database Tools - Schema & Migration Analysis
 // CLI 入口
+
+// 設置依賴注入容器
+var services = new ServiceCollection();
+
+// 註冊 MongoDB 序列化器
+MongoDbExtensions.RegisterSerializers();
+
+// 建立 ServiceProvider
+var serviceProvider = services.BuildServiceProvider();
 
 // 如果沒有參數，顯示使用說明
 if (args.Length < 1)

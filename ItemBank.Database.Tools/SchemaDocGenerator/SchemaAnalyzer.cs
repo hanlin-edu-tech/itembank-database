@@ -48,8 +48,7 @@ public sealed class SchemaAnalyzer
         return new SchemaDocument
         {
             Enums = _globalEnums.ToDictionary(
-                kvp => kvp.Key,
-                kvp => (IReadOnlyDictionary<string, string>)kvp.Value
+                kvp => kvp.Key, IReadOnlyDictionary<string, string> (kvp) => kvp.Value
             ),
             Collections = schemas
         };
@@ -87,7 +86,7 @@ public sealed class SchemaAnalyzer
             IsAuditable = typeof(IAuditable).IsAssignableFrom(collectionType),
             IsFinalizable = typeof(IFinalizable).IsAssignableFrom(collectionType),
             PrimaryKeys = primaryKeys,
-            BusinessKeys = Array.Empty<string>(), // 暫時留空
+            BusinessKeys = [], // 暫時留空
             Fields = fields
         };
     }
@@ -103,10 +102,7 @@ public sealed class SchemaAnalyzer
         // 如果有 enum 值，加入全局 enum 字典
         if (enumValues != null && enumType != null)
         {
-            if (!_globalEnums.ContainsKey(enumType))
-            {
-                _globalEnums[enumType] = enumValues;
-            }
+            _globalEnums.TryAdd(enumType, enumValues);
         }
 
         // 遞迴處理嵌套欄位中的 enum
@@ -134,7 +130,7 @@ public sealed class SchemaAnalyzer
         foreach (var field in fields.Values)
         {
             // 檢查此欄位是否為 enum
-            if (field.EnumValues != null && field.EnumType != null)
+            if (field is { EnumValues: not null, EnumType: not null })
             {
                 if (!_globalEnums.ContainsKey(field.EnumType))
                 {

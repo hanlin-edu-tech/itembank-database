@@ -1,3 +1,4 @@
+using ItemBank.Database.Core.Configuration.BsonSerializers.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -9,17 +10,17 @@ namespace ItemBank.Database.Core.Configuration.BsonSerializers;
 /// </summary>
 /// <typeparam name="TEnum">列舉類型</typeparam>
 public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationType = EnumSerializationType.CamelCase)
-    : SerializerBase<TEnum?>
+    : SerializerBase<TEnum>, IEnumSerializerMetadata
     where TEnum : struct, Enum
 {
-    public override TEnum? Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    public override TEnum Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
         var type = context.Reader.GetCurrentBsonType();
 
         if (type == BsonType.Null)
         {
             context.Reader.ReadNull();
-            return null;
+            throw new InvalidOperationException($"Cannot deserialize null to Enum '{typeof(TEnum).Name}'.");
         }
 
         if (serializationType == EnumSerializationType.Integer)
@@ -47,28 +48,22 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
         );
     }
 
-    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TEnum? value)
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TEnum value)
     {
-        if (value is null)
-        {
-            context.Writer.WriteNull();
-            return;
-        }
-
         switch (serializationType)
         {
             case EnumSerializationType.Integer:
-                var intValue = Convert.ToInt32(value.Value);
+                var intValue = Convert.ToInt32(value);
                 context.Writer.WriteInt32(intValue);
                 break;
 
             case EnumSerializationType.CamelCase:
-                var camelCaseValue = ToCamelCase(value.Value.ToString());
+                var camelCaseValue = ToCamelCase(value.ToString());
                 context.Writer.WriteString(camelCaseValue);
                 break;
 
             case EnumSerializationType.PascalCase:
-                context.Writer.WriteString(value.Value.ToString());
+                context.Writer.WriteString(value.ToString());
                 break;
 
             default:
@@ -89,6 +84,27 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
     /// 取得序列化類型
     /// </summary>
     public EnumSerializationType SerializationType => serializationType;
+
+    /// <summary>
+    /// 所有 Enum 值的序列化結果（name -> serialized value）
+    /// </summary>
+    public IReadOnlyDictionary<string, string> SerializedValues => _serializedValues ??= BuildSerializedValues();
+
+    private Dictionary<string, string>? _serializedValues;
+
+    private Dictionary<string, string> BuildSerializedValues()
+    {
+        var result = new Dictionary<string, string>();
+        var enumValues = Enum.GetValues(typeof(TEnum));
+
+        foreach (TEnum enumValue in enumValues)
+        {
+            var name = enumValue.ToString();
+            result[name] = GetSerializedValue(enumValue);
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// 取得 Enum 值序列化後的字串形式

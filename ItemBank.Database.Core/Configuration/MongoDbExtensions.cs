@@ -40,7 +40,7 @@ public static class MongoDbExtensions
         return services;
     }
 
-    private static void RegisterSerializers()
+    public static void RegisterSerializers()
     {
         // 註冊 String-based Id 序列化器
         BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<SubjectId>());

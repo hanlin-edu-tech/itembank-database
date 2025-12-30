@@ -1,6 +1,10 @@
 using System.ComponentModel;
 using System.Reflection;
+using ItemBank.Database.Core.Configuration.BsonSerializers;
+using ItemBank.Database.Core.Configuration.BsonSerializers.Abstractions;
+using ItemBank.Database.Core.Schema.ValueObjects.Abstractions;
 using ItemBank.Database.Tools.SchemaDocGenerator.Models;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 namespace ItemBank.Database.Tools.SchemaDocGenerator.TypeMappers;
@@ -46,7 +50,7 @@ public sealed class MongoTypeMapper
         if (underlyingType == typeof(DateTime) || underlyingType == typeof(DateTimeOffset)) return "datetime";
 
         // MongoDB ObjectId
-        if (underlyingType.Name == "ObjectId") return "objectId";
+        if (underlyingType == typeof(ObjectId)) return "objectId";
 
         // 值物件 (IConvertibleId<TSelf, TValue>)
         if (IsValueObject(underlyingType, out var baseType))
@@ -110,13 +114,13 @@ public sealed class MongoTypeMapper
     /// <param name="type">要檢查的型別</param>
     /// <param name="baseType">底層型別（"string" 或 "objectId"）</param>
     /// <returns>是否為值物件</returns>
-    private bool IsValueObject(Type type, out string baseType)
+    private static bool IsValueObject(Type type, out string baseType)
     {
         baseType = string.Empty;
 
         var convertibleIdInterface = type.GetInterfaces().FirstOrDefault(i =>
             i.IsGenericType &&
-            i.GetGenericTypeDefinition().Name == "IConvertibleId`2");
+            i.GetGenericTypeDefinition() == typeof(IConvertibleId<,>));
 
         if (convertibleIdInterface == null)
             return false;
@@ -126,7 +130,7 @@ public sealed class MongoTypeMapper
 
         if (underlyingType == typeof(string))
             baseType = "string";
-        else if (underlyingType.Name == "ObjectId")
+        else if (underlyingType == typeof(ObjectId))
             baseType = "objectId";
         else
             return false;
@@ -137,29 +141,19 @@ public sealed class MongoTypeMapper
     /// <summary>
     /// 取得 Enum 的基礎型別（根據序列化類型）
     /// </summary>
-    private string GetEnumBaseType(Type enumType)
+    private static string GetEnumBaseType(Type enumType)
     {
         try
         {
             var serializer = BsonSerializer.LookupSerializer(enumType);
-            var serializerType = serializer.GetType();
 
-            if (serializerType.Name.StartsWith("EnumSerializer"))
+            if (serializer is IEnumSerializerMetadata metadata)
             {
-                // 透過反射讀取 _serializationType 欄位
-                var field = serializerType.GetField("_serializationType",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-
-                if (field != null)
+                return metadata.SerializationType switch
                 {
-                    var serializationType = field.GetValue(serializer)?.ToString();
-
-                    return serializationType switch
-                    {
-                        "Integer" => "number",
-                        _ => "string"
-                    };
-                }
+                    EnumSerializationType.Integer => "number",
+                    _ => "string"
+                };
             }
         }
         catch
@@ -175,47 +169,28 @@ public sealed class MongoTypeMapper
     /// </summary>
     private Dictionary<string, string> GetEnumValues(Type enumType)
     {
-        var enumValues = Enum.GetValues(enumType);
-        var result = new Dictionary<string, string>();
-
         try
         {
-            // 嘗試查找 nullable enum 的序列化器（我們的自訂序列化器註冊為 TEnum?）
-            var nullableEnumType = typeof(Nullable<>).MakeGenericType(enumType);
-            var serializer = BsonSerializer.LookupSerializer(nullableEnumType);
-            var serializerType = serializer.GetType();
+            var serializer = BsonSerializer.LookupSerializer(enumType);
 
-            // 使用反射呼叫 GetSerializedValue 方法
-            var getSerializedValueMethod = serializerType.GetMethod("GetSerializedValue",
-                BindingFlags.Public | BindingFlags.Instance);
-
-            if (getSerializedValueMethod != null)
+            if (serializer is IEnumSerializerMetadata metadata)
             {
-                foreach (var enumValue in enumValues)
-                {
-                    var name = Enum.GetName(enumType, enumValue) ?? "";
-                    var serializedValue = getSerializedValueMethod.Invoke(serializer, new[] { enumValue })?.ToString() ?? "";
-                    result[name] = serializedValue;
-                }
-            }
-            else
-            {
-                // Fallback: 無法取得序列化器方法時，使用 enum 名稱
-                foreach (var enumValue in enumValues)
-                {
-                    var name = Enum.GetName(enumType, enumValue) ?? "";
-                    result[name] = name;
-                }
+                return new Dictionary<string, string>(metadata.SerializedValues);
             }
         }
         catch
         {
-            // Fallback: 發生錯誤時，使用 enum 名稱
-            foreach (var enumValue in enumValues)
-            {
-                var name = Enum.GetName(enumType, enumValue) ?? "";
-                result[name] = name;
-            }
+            // 如果無法取得序列化器，使用 fallback
+        }
+
+        // Fallback: 使用 enum 名稱
+        var result = new Dictionary<string, string>();
+        var enumValues = Enum.GetValues(enumType);
+
+        foreach (var enumValue in enumValues)
+        {
+            var name = Enum.GetName(enumType, enumValue) ?? "";
+            result[name] = name;
         }
 
         return result;

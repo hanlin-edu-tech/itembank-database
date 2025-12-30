@@ -1,3 +1,5 @@
+using ItemBank.Database.Core.Configuration.BsonSerializers;
+
 namespace ItemBank.Database.Tools.SchemaDocGenerator.Models;
 
 /// <summary>
@@ -39,22 +41,4 @@ public sealed record EnumValue
         if (value.Length == 1) return value.ToLowerInvariant();
         return char.ToLowerInvariant(value[0]) + value.Substring(1);
     }
-}
-
-/// <summary>
-/// Enum 序列化類型
-/// </summary>
-public enum EnumSerializationType
-{
-    /// <summary>序列化為整數</summary>
-    Integer,
-
-    /// <summary>序列化為 camelCase 字串</summary>
-    CamelCase,
-
-    /// <summary>序列化為 PascalCase 字串</summary>
-    PascalCase,
-
-    /// <summary>預設字串序列化</summary>
-    String
 }
