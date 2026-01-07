@@ -45,12 +45,20 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
         sb.AppendLine($"{indentStr}  description: \"{EscapeYaml(schema.Description)}\"");
 
         // Indices
-        sb.AppendLine($"{indentStr}  indices:");
         if (schema.Indices.Any())
         {
+            sb.AppendLine($"{indentStr}  indices:");
             foreach (var index in schema.Indices)
             {
-                sb.AppendLine($"{indentStr}    - name: {index.Name}");
+                sb.AppendLine($"{indentStr}    \"{EscapeYaml(index.Name)}\":");
+                if (index.Options.Any())
+                {
+                    sb.AppendLine($"{indentStr}      options:");
+                    foreach (var option in index.Options)
+                    {
+                        sb.AppendLine($"{indentStr}        {option.Key}: {EscapeYaml(option.Value)}");
+                    }
+                }
                 if (index.Fields.Any())
                 {
                     sb.AppendLine($"{indentStr}      fields:");
@@ -64,7 +72,7 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
         }
         else
         {
-            sb.AppendLine($"{indentStr}    []");
+            sb.AppendLine($"{indentStr}  indices: {{}}");
         }
 
         // Fields
@@ -95,6 +103,11 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
         }
 
         sb.AppendLine($"{indentStr}  description: \"{EscapeYaml(field.Description)}\"");
+
+        if (field.Nullable)
+        {
+            sb.AppendLine($"{indentStr}  nullable: true");
+        }
 
         // 如果有嵌套欄位
         if (field.Fields != null && field.Fields.Any())

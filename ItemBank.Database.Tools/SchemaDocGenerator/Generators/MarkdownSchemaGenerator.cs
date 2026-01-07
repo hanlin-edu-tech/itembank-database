@@ -64,27 +64,28 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
         {
             sb.AppendLine("### 索引");
             sb.AppendLine();
-            sb.AppendLine("| 索引名稱 | 欄位 | 方向 |");
-            sb.AppendLine("|---------|------|------|");
+            sb.AppendLine("| 索引名稱 | 欄位 | 方向 | 選項 |");
+            sb.AppendLine("|---------|------|------|------|");
 
             foreach (var index in schema.Indices)
             {
+                var optionsText = FormatIndexOptions(index.Options);
                 if (index.Fields.Any())
                 {
                     // 顯示第一個欄位
                     var firstField = index.Fields[0];
-                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | {EscapeMarkdown(firstField.FieldName)} | {firstField.Direction} |");
+                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | {EscapeMarkdown(firstField.FieldName)} | {firstField.Direction} | {EscapeMarkdown(optionsText)} |");
 
                     // 如果有多個欄位，繼續顯示
                     for (int i = 1; i < index.Fields.Count; i++)
                     {
                         var field = index.Fields[i];
-                        sb.AppendLine($"|  | {EscapeMarkdown(field.FieldName)} | {field.Direction} |");
+                        sb.AppendLine($"|  | {EscapeMarkdown(field.FieldName)} | {field.Direction} |  |");
                     }
                 }
                 else
                 {
-                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | - | - |");
+                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | - | - | {EscapeMarkdown(optionsText)} |");
                 }
             }
 
@@ -93,14 +94,15 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
 
         sb.AppendLine("### 欄位");
         sb.AppendLine();
-        sb.AppendLine("| 欄位名稱 | 型別 | 描述 |");
-        sb.AppendLine("|---------|------|------|");
+        sb.AppendLine("| 欄位名稱 | 型別 | Nullable | 描述 |");
+        sb.AppendLine("|---------|------|----------|------|");
 
         // 扁平化所有欄位
         var flattenedFields = FlattenFields(schema.Fields);
-        foreach (var (fieldName, type, description) in flattenedFields)
+        foreach (var (fieldName, type, isNullable, description) in flattenedFields)
         {
-            sb.AppendLine($"| {EscapeMarkdown(fieldName)} | `{EscapeMarkdown(type)}` | {EscapeMarkdown(description)} |");
+            var nullableText = isNullable ? "true" : "-";
+            sb.AppendLine($"| {EscapeMarkdown(fieldName)} | `{EscapeMarkdown(type)}` | {nullableText} | {EscapeMarkdown(description)} |");
         }
 
         sb.AppendLine();
@@ -110,11 +112,11 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
     /// 扁平化欄位結構
     /// </summary>
     /// <returns>欄位清單 (欄位名稱, 型別, 描述)</returns>
-    private List<(string FieldName, string Type, string Description)> FlattenFields(
+    private List<(string FieldName, string Type, bool Nullable, string Description)> FlattenFields(
         IReadOnlyDictionary<string, FieldSchema> fields,
         string prefix = "")
     {
-        var result = new List<(string, string, string)>();
+        var result = new List<(string, string, bool, string)>();
 
         foreach (var (fieldName, field) in fields)
         {
@@ -133,7 +135,7 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
             }
 
             // 加入當前欄位
-            result.Add((fullFieldName, typeStr, field.Description));
+            result.Add((fullFieldName, typeStr, field.Nullable, field.Description));
 
             // 如果有嵌套欄位，遞迴處理
             if (field.Fields != null && field.Fields.Any())
@@ -160,6 +162,14 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
             return value;
 
         return value.Replace("|", "\\|");
+    }
+
+    private string FormatIndexOptions(IReadOnlyDictionary<string, string> options)
+    {
+        if (options.Count == 0)
+            return "-";
+
+        return string.Join("; ", options.Select(kvp => $"{kvp.Key}={kvp.Value}"));
     }
 
     /// <summary>

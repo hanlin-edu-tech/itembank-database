@@ -222,7 +222,8 @@ public sealed class MongoTypeMapper
                     IdType = idType,
                     EnumType = enumType,
                     Fields = nestedFields,
-                    EnumValues = enumValues
+                    EnumValues = enumValues,
+                    Nullable = false
                 };
             }
 

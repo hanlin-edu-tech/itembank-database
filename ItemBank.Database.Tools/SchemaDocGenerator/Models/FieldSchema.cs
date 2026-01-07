@@ -36,4 +36,9 @@ public sealed record FieldSchema
     /// Enum 的所有可能值（name -> value 對應，僅用於內部收集，不輸出到文件）
     /// </summary>
     public IReadOnlyDictionary<string, string>? EnumValues { get; init; }
+
+    /// <summary>
+    /// 是否可為 null
+    /// </summary>
+    public bool Nullable { get; init; }
 }

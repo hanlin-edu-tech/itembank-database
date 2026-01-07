@@ -1,7 +1,11 @@
 using ItemBank.Database.Core.Configuration;
+using ItemBank.Database.Core.Schema.Collections;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Tools.IndexCreator;
 using ItemBank.Database.Tools.SchemaDocGenerator;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 
 // ItemBank Database Tools - Schema & Migration Analysis
 // CLI 入口
@@ -124,6 +128,5 @@ static async Task ExecuteCreateIndexAsync(string[] cmdArgs)
         return;
     }
 
-    var command = new CreateIndexCommand();
     await CreateIndexCommand.ExecuteAsync(connectionString, databaseName);
 }

@@ -10,6 +10,9 @@ public sealed record IndexSchema
 
     /// <summary>索引欄位清單</summary>
     public required IReadOnlyList<IndexField> Fields { get; init; }
+
+    /// <summary>索引選項</summary>
+    public required IReadOnlyDictionary<string, string> Options { get; init; }
 }
 
 /// <summary>

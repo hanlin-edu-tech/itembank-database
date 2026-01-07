@@ -7,7 +7,7 @@ namespace ItemBank.Database.Tools.IndexCreator;
 /// <summary>
 /// 創建索引命令
 /// </summary>
-public sealed class CreateIndexCommand
+public static class CreateIndexCommand
 {
     private record IndexCreationResult(
         string CollectionName,

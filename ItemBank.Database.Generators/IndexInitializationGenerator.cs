@@ -43,6 +43,9 @@ public sealed class IndexInitializationGenerator : IIncrementalGenerator
     private static void Execute(Compilation compilation, ImmutableArray<INamedTypeSymbol?> candidates,
         SourceProductionContext context)
     {
+        if (!string.Equals(compilation.AssemblyName, "ItemBank.Database.Core", StringComparison.Ordinal))
+            return;
+
         var indexableInterfaceSymbol = compilation.GetTypeByMetadataName(
             "ItemBank.Database.Core.Schema.Interfaces.IIndexable`1");
 
