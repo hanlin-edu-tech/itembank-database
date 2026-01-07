@@ -55,7 +55,16 @@ public sealed class SchemaDocCommand
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new Rule($"[bold]輸出結果 ({format.ToUpperInvariant()})[/]").LeftJustified());
             AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine(output);
+            if (format.Equals("yaml", StringComparison.OrdinalIgnoreCase))
+            {
+                var consoleGenerator = new YamlSchemaConsoleGenerator();
+                var markup = consoleGenerator.GenerateMarkup(document);
+                AnsiConsole.Markup(markup);
+            }
+            else
+            {
+                AnsiConsole.WriteLine(output);
+            }
         }
         else
         {
