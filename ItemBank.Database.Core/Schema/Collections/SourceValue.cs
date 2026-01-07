@@ -8,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("SourceValues")]
 [Description("出處")]
-public sealed class SourceValue : IAuditable
+public sealed class SourceValue : IAuditable, IIndexable<SourceValue>
 {
     [BsonId]
     [Description("Id")]

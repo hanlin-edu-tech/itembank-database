@@ -8,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("TextbookContents")]
 [Description("課本章節表")]
-public class TextbookContent : IFinalizable, IAuditable
+public class TextbookContent : IFinalizable, IAuditable, IIndexable<TextbookContent>
 {
     [BsonId]
     [Description("Id")]

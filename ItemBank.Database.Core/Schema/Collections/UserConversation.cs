@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -8,7 +9,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("UserConversations")]
 [Description("使用者對話")]
-public class UserConversation
+public class UserConversation : IIndexable<UserConversation>
 {
     [BsonId]
     [Description("Id")]

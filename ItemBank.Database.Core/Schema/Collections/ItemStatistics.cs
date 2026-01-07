@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemStatistics")]
 [Description("題目統計")]
-public class ItemStatistics
+public class ItemStatistics : IIndexable<ItemStatistics>
 {
     [BsonId]
     [Description("Id")]

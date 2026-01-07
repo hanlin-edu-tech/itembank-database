@@ -8,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("UserTypes")]
 [Description("題型表")]
-public class UserType : IFinalizable, IAuditable
+public class UserType : IFinalizable, IAuditable, IIndexable<UserType>
 {
     [BsonId]
     [Description("Id")]

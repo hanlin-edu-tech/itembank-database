@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemMapping.ItemMetadatas")]
 [Description("題目元資料")]
-public class ItemMetadata
+public class ItemMetadata : IIndexable<ItemMetadata>
 {
     [BsonId]
     [Description("題目 Id")]

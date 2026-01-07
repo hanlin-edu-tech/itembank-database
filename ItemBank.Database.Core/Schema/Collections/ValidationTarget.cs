@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ValidationTargets")]
 [Description("驗證目標")]
-public class ValidationTarget
+public class ValidationTarget : IIndexable<ValidationTarget>
 {
     [BsonId]
     [Description("Id")]

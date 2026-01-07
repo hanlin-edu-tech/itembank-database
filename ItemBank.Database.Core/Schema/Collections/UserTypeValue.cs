@@ -8,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("UserTypeValues")]
 [Description("題型")]
-public sealed class UserTypeValue : IAuditable
+public sealed class UserTypeValue : IAuditable, IIndexable<UserTypeValue>
 {
     [BsonId]
     [Description("Id")]

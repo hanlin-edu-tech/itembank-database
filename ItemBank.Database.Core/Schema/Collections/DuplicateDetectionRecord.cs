@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("DuplicateDetectionRecords")]
 [Description("重複偵測記錄")]
-public class DuplicateDetectionRecord
+public class DuplicateDetectionRecord : IIndexable<DuplicateDetectionRecord>
 {
     [BsonId]
     [Description("Id")]

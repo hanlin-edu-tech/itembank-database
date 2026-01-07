@@ -9,7 +9,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("CatalogGroups")]
 [Description("產品")]
-public sealed class CatalogGroup : IAuditable
+public sealed class CatalogGroup : IAuditable, IIndexable<CatalogGroup>
 {
     [BsonId]
     [Description("Id")]

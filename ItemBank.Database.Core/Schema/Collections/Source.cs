@@ -8,7 +8,7 @@ namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("Sources")]
 [Description("出處表")]
-public class Source : IFinalizable, IAuditable
+public class Source : IFinalizable, IAuditable, IIndexable<Source>
 {
     [BsonId]
     [Description("Id")]
