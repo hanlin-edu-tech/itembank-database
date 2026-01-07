@@ -1,15 +1,18 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ImportTasks")]
 [Description("匯入任務")]
-public class ImportTask
+public class ImportTask : IIndexable<ImportTask>
 {
     [BsonId]
     [Description("Id")]
@@ -59,6 +62,34 @@ public class ImportTask
 
     [Description("匯入題目")]
     public required Item[] Items { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ImportTask>> IIndexable<ImportTask>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.Items.Select(item => item.Id))
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.SubjectIds)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.CatalogGroupCode)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.UploadedAt)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.UploaderId)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.UploaderName)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.FileName)
+        ),
+        new(
+            Builders<ImportTask>.IndexKeys.Ascending(x => x.DocumentId)
+        )
+    ];
 
     public class TaskLog
     {

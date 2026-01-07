@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("Catalogs")]
 [Description("目錄")]
-public class Catalog
+public class Catalog : IIndexable<Catalog>
 {
     [BsonId]
     [Description("Id")]
@@ -60,6 +63,13 @@ public class Catalog
 
     [Description("驗證規則清單")]
     public required IReadOnlyList<CatalogValidationRule> ValidationRules { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<Catalog>> IIndexable<Catalog>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<Catalog>.IndexKeys.Ascending(x => x.SubjectId)
+        )
+    ];
 }
 
 [Description("目錄驗證規則，從 ValidationTarget 衍生而來")]

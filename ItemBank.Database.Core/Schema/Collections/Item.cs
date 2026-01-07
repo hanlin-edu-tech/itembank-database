@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("Items")]
 [Description("題目")]
-public class Item
+public class Item : IIndexable<Item>
 {
     [BsonId]
     [Description("Id")]
@@ -82,6 +85,24 @@ public class Item
 
     [Description("是否有表格")]
     public required bool HasTable { get; init; }
+    
+    [Description("判斷是否有複製到新 s3")]
+    [BsonIgnoreIfNull]
+    public DateTime? S3Copied { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<Item>> IIndexable<Item>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<Item>.IndexKeys.Descending(x => x.UpdatedOn)
+        ),
+        new(
+            Builders<Item>.IndexKeys.Ascending(x => x.S3Copied)
+        ),
+        new(
+            Builders<Item>.IndexKeys.Ascending(x => x.ContentResourceManifest
+                .Select(manifest => manifest.ImageSha512Hash))
+        )
+    ];
 }
 
 [Description("題目內容")]

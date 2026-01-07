@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("Documents")]
 [Description("五欄檔案")]
-public class Document
+public class Document : IIndexable<Document>
 {
     [BsonId]
     [Description("Id")]
@@ -72,4 +75,14 @@ public class Document
 
     [Description("年度")]
     public required int Year { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<Document>> IIndexable<Document>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<Document>.IndexKeys.Ascending(x => x.DocumentRepoId)
+        ),
+        new(
+            Builders<Document>.IndexKeys.Ascending(x => x.ProductSectionIds)
+        )
+    ];
 }

@@ -1,17 +1,19 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("Dimensions")]
 [Description("向度資訊表")]
-public sealed class Dimension : IFinalizable, IAuditable
+public sealed class Dimension : IFinalizable, IAuditable, IIndexable<Dimension>
 {
     [BsonId]
     [Description("Id")]

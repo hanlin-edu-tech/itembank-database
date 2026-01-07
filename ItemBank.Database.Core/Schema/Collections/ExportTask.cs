@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ExportTasks")]
 [Description("匯出任務")]
-public class ExportTask
+public class ExportTask : IIndexable<ExportTask>
 {
     [BsonId]
     [Description("Id")]
@@ -64,6 +67,16 @@ public class ExportTask
 
     [Description("是否啟用")]
     public required bool Enabled { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ExportTask>> IIndexable<ExportTask>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ExportTask>.IndexKeys.Ascending(x => x.UserId)
+        ),
+        new(
+            Builders<ExportTask>.IndexKeys.Ascending(x => x.Status)
+        )
+    ];
 }
 
 [Description("匯出規格")]

@@ -1,14 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ProductSections")]
 [Description("產品單元章節")]
-public class ProductSection : IAuditable
+public class ProductSection : IAuditable, IIndexable<ProductSection>
 {
     [BsonId]
     [Description("Id")]
@@ -67,4 +69,20 @@ public class ProductSection : IAuditable
 
     [Description("是否有子項目")]
     public required bool HasChildren { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ProductSection>> IIndexable<ProductSection>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ProductSection>.IndexKeys.Ascending(x => x.DocumentIds)
+        ),
+        new(
+            Builders<ProductSection>.IndexKeys.Ascending(x => x.ProductContentId)
+        ),
+        new(
+            Builders<ProductSection>.IndexKeys.Ascending(x => x.DimensionValueIds)
+        ),
+        new(
+            Builders<ProductSection>.IndexKeys.Ascending(x => x.Path)
+        )
+    ];
 }

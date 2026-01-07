@@ -1,15 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("DimensionValues")]
 [Description("向度資訊")]
-public class DimensionValue : IAuditable
+public class DimensionValue : IAuditable, IIndexable<DimensionValue>
 {
     [BsonId]
     [Description("Id")]
@@ -77,4 +79,11 @@ public class DimensionValue : IAuditable
     [Obsolete("過去使用軟刪除機制，現在沒有軟刪除")]
     [BsonIgnoreIfNull]
     public bool? Archived { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<DimensionValue>> IIndexable<DimensionValue>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<DimensionValue>.IndexKeys.Ascending(x => x.Path)
+        )
+    ];
 }

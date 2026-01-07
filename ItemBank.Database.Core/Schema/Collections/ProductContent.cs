@@ -1,16 +1,18 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ProductContents")]
 [Description("產品單元表")]
-public class ProductContent : IFinalizable, IAuditable
+public class ProductContent : IFinalizable, IAuditable, IIndexable<ProductContent>
 {
     [BsonId]
     [Description("Id")]
@@ -75,4 +77,16 @@ public class ProductContent : IFinalizable, IAuditable
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ProductContent>> IIndexable<ProductContent>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ProductContent>.IndexKeys
+                .Ascending(x => x.BodyOfKnowledgeId)
+                .Ascending(x => x.Year)
+        ),
+        new(
+            Builders<ProductContent>.IndexKeys.Ascending(x => x.Year)
+        )
+    ];
 }

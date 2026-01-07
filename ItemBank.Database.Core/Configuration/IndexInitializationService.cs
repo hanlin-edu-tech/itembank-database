@@ -72,19 +72,38 @@ file static class DbContextExtensions
             .MakeGenericMethod(documentType);
 
         var collection = getCollectionMethod.Invoke(dbContext, null);
+        if (collection == null)
+            return;
 
-        // 獲取靜態方法 CreateIndexesAsync
-        var createIndexMethod = documentType.GetMethod(
-            nameof(IIndexable<>.CreateIndexesAsync),
-            BindingFlags.Public | BindingFlags.Static,
-            null,
-            [typeof(IMongoCollection<>).MakeGenericType(documentType)],
-            null);
+        // 獲取靜態屬性 CreateIndexModels
+        var createIndexModelsProperty = indexableInterface.GetProperty(
+            nameof(IIndexable<>.CreateIndexModels),
+            BindingFlags.Public | BindingFlags.Static);
 
-        // 呼叫靜態方法（第一個參數為 null，因為是靜態方法）
-        if (createIndexMethod?.Invoke(null, [collection]) is Task task)
+        if (createIndexModelsProperty == null)
+            return;
+
+        // 取得索引模型列表
+        var indexModels = createIndexModelsProperty.GetValue(null);
+        if (indexModels == null)
+            return;
+
+        // 呼叫 collection.Indexes.CreateManyAsync(indexModels)
+        var indexesProperty = collection.GetType().GetProperty(nameof(IMongoCollection<>.Indexes));
+        if (indexesProperty == null)
+            return;
+
+        var indexManager = indexesProperty.GetValue(collection);
+        if (indexManager == null)
+            return;
+
+        var createManyMethod = indexManager.GetType().GetMethod(
+            nameof(IMongoCollection<>.Indexes.CreateManyAsync),
+            [indexModels.GetType(), typeof(CancellationToken)]);
+
+        if (createManyMethod != null)
         {
-            await task;
+            await (Task)createManyMethod.Invoke(indexManager, [indexModels, CancellationToken.None])!;
         }
     }
 

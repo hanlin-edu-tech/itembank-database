@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemMapping.ProductSectionItemMembers")]
 [Description("產品單元章節題目成員")]
-public class ProductSectionItemMember
+public class ProductSectionItemMember : IIndexable<ProductSectionItemMember>
 {
     [BsonId]
     [Description("Id")]
@@ -70,6 +73,15 @@ public class ProductSectionItemMember
 
     [Description("期")]
     public required string Terms { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ProductSectionItemMember>> IIndexable<ProductSectionItemMember>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ProductSectionItemMember>.IndexKeys
+                .Ascending(x => x.ProductContentId)
+                .Ascending(x => x.DocumentRepoId)
+        )
+    ];
 }
 
 [Description("產品單元章節儲存庫題目成員")]

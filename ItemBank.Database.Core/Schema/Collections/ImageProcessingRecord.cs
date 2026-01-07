@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ImageProcessingRecords")]
 [Description("圖片處理記錄")]
-public class ImageProcessingRecord
+public class ImageProcessingRecord : IIndexable<ImageProcessingRecord>
 {
     [BsonId]
     [Description("內容 SHA512 雜湊值")]
@@ -51,4 +54,17 @@ public class ImageProcessingRecord
 
     [Description("最後更新時間")]
     public required DateTime UpdatedAt { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ImageProcessingRecord>> IIndexable<ImageProcessingRecord>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ImageProcessingRecord>.IndexKeys.Ascending(x => x.BatchId)
+        ),
+        new(
+            Builders<ImageProcessingRecord>.IndexKeys.Ascending(x => x.BatchStatus)
+        ),
+        new(
+            Builders<ImageProcessingRecord>.IndexKeys.Descending(x => x.UpdatedAt)
+        )
+    ];
 }

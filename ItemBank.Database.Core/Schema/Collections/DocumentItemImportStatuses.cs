@@ -2,15 +2,18 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("DocumentItemImportStatuses")]
 [Description("五欄檔案題目匯入狀態檢視")]
-public sealed class DocumentItemImportStatuses
+public sealed class DocumentItemImportStatuses : IIndexable<DocumentItemImportStatuses>
 {
     [BsonId]
     [Description("複合鍵")]
@@ -45,6 +48,22 @@ public sealed class DocumentItemImportStatuses
 
     [Description("完成時間")]
     public DateTime? FinishedAt { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<DocumentItemImportStatuses>> IIndexable<DocumentItemImportStatuses>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<DocumentItemImportStatuses>.IndexKeys.Ascending(x => x.Id.ItemId)
+        ),
+        new(
+            Builders<DocumentItemImportStatuses>.IndexKeys.Ascending(x => x.Id.DocumentId)
+        ),
+        new(
+            Builders<DocumentItemImportStatuses>.IndexKeys.Ascending(x => x.TaskId)
+        ),
+        new(
+            Builders<DocumentItemImportStatuses>.IndexKeys.Ascending(x => x.RetryCount)
+        )
+    ];
 
     [Description("五欄檔案題目複合鍵")]
     public sealed class CompositeKey

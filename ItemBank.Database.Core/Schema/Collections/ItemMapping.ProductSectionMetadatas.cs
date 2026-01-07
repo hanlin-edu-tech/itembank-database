@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemMapping.ProductSectionMetadatas")]
 [Description("產品單元章節元資料")]
-public class ProductSectionMetadata
+public class ProductSectionMetadata : IIndexable<ProductSectionMetadata>
 {
     [BsonId]
     [Description("產品單元章節 Id")]
@@ -40,6 +43,16 @@ public class ProductSectionMetadata
 
     [Description("年度")]
     public required int Year { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ProductSectionMetadata>> IIndexable<ProductSectionMetadata>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ProductSectionMetadata>.IndexKeys.Ascending(x => x.ProductContentId)
+        ),
+        new(
+            Builders<ProductSectionMetadata>.IndexKeys.Ascending(x => x.PedigreeContentIds)
+        )
+    ];
 }
 
 [Description("產品單元章節向度資訊")]

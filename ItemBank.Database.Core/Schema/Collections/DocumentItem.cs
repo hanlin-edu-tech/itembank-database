@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Enums;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("DocumentItems")]
 [Description("五欄檔案題目")]
-public class DocumentItem
+public class DocumentItem : IIndexable<DocumentItem>
 {
     [BsonId]
     [Description("Id")]
@@ -41,6 +44,20 @@ public class DocumentItem
     [Obsolete("元資料，發現註解上有標示應該可以棄用，暫時留著。應該是處理過程中會用到的資料")]
     public Dictionary<string, string>? Metadata { get; init; }
 
+    static IReadOnlyList<CreateIndexModel<DocumentItem>> IIndexable<DocumentItem>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<DocumentItem>.IndexKeys.Ascending(x => x.ItemId)
+        ),
+        new(
+            Builders<DocumentItem>.IndexKeys.Ascending(x => x.DocumentId)
+        ),
+        new(
+            Builders<DocumentItem>.IndexKeys
+                .Ascending(x => x.MetadataList.Select(list => list.MetadataType))
+                .Ascending(x => x.MetadataList.Select(list => list.MetadataValueId))
+        )
+    ];
 }
 
 [Description("五欄檔案題目元資料")]

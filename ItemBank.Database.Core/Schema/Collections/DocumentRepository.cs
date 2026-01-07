@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("DocumentRepositories")]
 [Description("五欄檔案儲存庫")]
-public class DocumentRepository
+public class DocumentRepository : IIndexable<DocumentRepository>
 {
     [BsonId]
     [Description("Id")]
@@ -48,6 +51,16 @@ public class DocumentRepository
 
     [Description("包裹 Id")]
     public PackageId? PackageId { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<DocumentRepository>> IIndexable<DocumentRepository>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<DocumentRepository>.IndexKeys.Ascending(x => x.CatalogId)
+        ),
+        new(
+            Builders<DocumentRepository>.IndexKeys.Ascending(x => x.ProductContentIds)
+        )
+    ];
 }
 
 [Description("標記題目數量記錄")]

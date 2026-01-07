@@ -1,14 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("TextbookSections")]
 [Description("課本章節")]
-public class TextbookSection : IAuditable
+public class TextbookSection : IAuditable, IIndexable<TextbookSection>
 {
     [BsonId]
     [Description("Id")]
@@ -52,4 +54,11 @@ public class TextbookSection : IAuditable
 
     [Description("更新時間")]
     public required DateTime UpdatedOn { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<TextbookSection>> IIndexable<TextbookSection>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<TextbookSection>.IndexKeys.Ascending(x => x.DimensionValueIds)
+        )
+    ];
 }

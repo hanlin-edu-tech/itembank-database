@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using ItemBank.Database.Core.Schema.Attributes;
+using ItemBank.Database.Core.Schema.Extensions;
+using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Core.Schema.ValueObjects;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("ItemIssues")]
 [Description("題目問題")]
-public class ItemIssue
+public class ItemIssue : IIndexable<ItemIssue>
 {
     [BsonId]
     [Description("Id")]
@@ -33,4 +36,11 @@ public class ItemIssue
 
     [Description("更新時間")]
     public DateTime? UpdatedOn { get; init; }
+
+    static IReadOnlyList<CreateIndexModel<ItemIssue>> IIndexable<ItemIssue>.CreateIndexModelsWithoutDefault =>
+    [
+        new(
+            Builders<ItemIssue>.IndexKeys.Ascending(x => x.ItemId)
+        )
+    ];
 }
