@@ -1,7 +1,4 @@
 using Microsoft.Extensions.Hosting;
-using MongoDB.Driver;
-using ItemBank.Database.Core.Schema.Interfaces;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 
 namespace ItemBank.Database.Core.Configuration;
@@ -44,82 +41,12 @@ file static class DbContextExtensions
     /// </summary>
     public static async Task InitializeIndexesAsync(this DbContext dbContext, CancellationToken cancellationToken = default)
     {
-        var indexableTypes = FindAllIndexableTypes();
-
-        foreach (var type in indexableTypes)
+        foreach (var initializer in IndexInitializationRegistry.All)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
 
-            await CreateIndexesAsync(dbContext, type);
+            await initializer.InitializeAsync(dbContext, cancellationToken);
         }
-    }
-
-    /// <summary>
-    /// 為指定類型建立索引
-    /// </summary>
-    private static async Task CreateIndexesAsync(DbContext dbContext, Type documentType)
-    {
-        // 獲取 IIndexable<T> 接口
-        var indexableInterface = typeof(IIndexable<>).MakeGenericType(documentType);
-
-        if (!documentType.GetInterfaces().Contains(indexableInterface))
-            return;
-
-        // 獲取 GetCollection<T> 方法並呼叫
-        var getCollectionMethod = typeof(DbContext)
-            .GetMethod(nameof(DbContext.GetCollection), Type.EmptyTypes)!
-            .MakeGenericMethod(documentType);
-
-        var collection = getCollectionMethod.Invoke(dbContext, null);
-        if (collection == null)
-            return;
-
-        // 獲取靜態屬性 CreateIndexModels
-        var createIndexModelsProperty = indexableInterface.GetProperty(
-            nameof(IIndexable<>.CreateIndexModels),
-            BindingFlags.Public | BindingFlags.Static);
-
-        if (createIndexModelsProperty == null)
-            return;
-
-        // 取得索引模型列表
-        var indexModels = createIndexModelsProperty.GetValue(null);
-        if (indexModels == null)
-            return;
-
-        // 呼叫 collection.Indexes.CreateManyAsync(indexModels)
-        var indexesProperty = collection.GetType().GetProperty(nameof(IMongoCollection<>.Indexes));
-        if (indexesProperty == null)
-            return;
-
-        var indexManager = indexesProperty.GetValue(collection);
-        if (indexManager == null)
-            return;
-
-        var createManyMethod = indexManager.GetType().GetMethod(
-            nameof(IMongoCollection<>.Indexes.CreateManyAsync),
-            [indexModels.GetType(), typeof(CancellationToken)]);
-
-        if (createManyMethod != null)
-        {
-            await (Task)createManyMethod.Invoke(indexManager, [indexModels, CancellationToken.None])!;
-        }
-    }
-
-    /// <summary>
-    /// 掃描並尋找所有實作 IIndexable&lt;T&gt; 的類型
-    /// </summary>
-    private static IEnumerable<Type> FindAllIndexableTypes()
-    {
-        var assembly = typeof(DbContext).Assembly;
-        var indexableGenericInterface = typeof(IIndexable<>);
-
-        return assembly.GetTypes()
-            .Where(type =>
-                type is { IsClass: true, IsAbstract: false } &&
-                type.GetInterfaces().Any(i =>
-                    i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == indexableGenericInterface));
     }
 }

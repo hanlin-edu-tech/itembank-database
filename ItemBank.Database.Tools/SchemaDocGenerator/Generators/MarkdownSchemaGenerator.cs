@@ -57,20 +57,40 @@ public sealed class MarkdownSchemaGenerator : ISchemaDocGenerator
         sb.AppendLine($"## {schema.CollectionName}");
         sb.AppendLine();
         sb.AppendLine($"**描述**: {schema.Description}");
-
-        // 主鍵
-        var primaryKeysStr = schema.PrimaryKeys.Any()
-            ? string.Join(", ", schema.PrimaryKeys.Select(ToCamelCase))
-            : "-";
-        sb.AppendLine($"**主鍵**: {primaryKeysStr}");
-
-        // 業務鍵
-        var businessKeysStr = schema.BusinessKeys.Any()
-            ? string.Join(", ", schema.BusinessKeys.Select(ToCamelCase))
-            : "-";
-        sb.AppendLine($"**業務鍵**: {businessKeysStr}");
-
         sb.AppendLine();
+
+        // 索引
+        if (schema.Indices.Any())
+        {
+            sb.AppendLine("### 索引");
+            sb.AppendLine();
+            sb.AppendLine("| 索引名稱 | 欄位 | 方向 |");
+            sb.AppendLine("|---------|------|------|");
+
+            foreach (var index in schema.Indices)
+            {
+                if (index.Fields.Any())
+                {
+                    // 顯示第一個欄位
+                    var firstField = index.Fields[0];
+                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | {EscapeMarkdown(firstField.FieldName)} | {firstField.Direction} |");
+
+                    // 如果有多個欄位，繼續顯示
+                    for (int i = 1; i < index.Fields.Count; i++)
+                    {
+                        var field = index.Fields[i];
+                        sb.AppendLine($"|  | {EscapeMarkdown(field.FieldName)} | {field.Direction} |");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine($"| {EscapeMarkdown(index.Name)} | - | - |");
+                }
+            }
+
+            sb.AppendLine();
+        }
+
         sb.AppendLine("### 欄位");
         sb.AppendLine();
         sb.AppendLine("| 欄位名稱 | 型別 | 描述 |");

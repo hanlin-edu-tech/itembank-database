@@ -44,27 +44,22 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
         sb.AppendLine($"{indentStr}{schema.CollectionName}:");
         sb.AppendLine($"{indentStr}  description: \"{EscapeYaml(schema.Description)}\"");
 
-        // Primary keys
-        sb.AppendLine($"{indentStr}  primary_keys:");
-        if (schema.PrimaryKeys.Any())
+        // Indices
+        sb.AppendLine($"{indentStr}  indices:");
+        if (schema.Indices.Any())
         {
-            foreach (var key in schema.PrimaryKeys)
+            foreach (var index in schema.Indices)
             {
-                sb.AppendLine($"{indentStr}    - {ToCamelCase(key)}");
-            }
-        }
-        else
-        {
-            sb.AppendLine($"{indentStr}    []");
-        }
-
-        // Business keys
-        sb.AppendLine($"{indentStr}  business_keys:");
-        if (schema.BusinessKeys.Any())
-        {
-            foreach (var key in schema.BusinessKeys)
-            {
-                sb.AppendLine($"{indentStr}    - {ToCamelCase(key)}");
+                sb.AppendLine($"{indentStr}    - name: {index.Name}");
+                if (index.Fields.Any())
+                {
+                    sb.AppendLine($"{indentStr}      fields:");
+                    foreach (var field in index.Fields)
+                    {
+                        sb.AppendLine($"{indentStr}        - field: {field.FieldName}");
+                        sb.AppendLine($"{indentStr}          direction: {field.Direction}");
+                    }
+                }
             }
         }
         else

@@ -20,11 +20,8 @@ public sealed record CollectionSchema
     /// <summary>是否實作 IFinalizable 介面</summary>
     public required bool IsFinalizable { get; init; }
 
-    /// <summary>主鍵欄位清單</summary>
-    public required IReadOnlyList<string> PrimaryKeys { get; init; }
-
-    /// <summary>業務鍵欄位清單</summary>
-    public required IReadOnlyList<string> BusinessKeys { get; init; }
+    /// <summary>索引清單</summary>
+    public required IReadOnlyList<IndexSchema> Indices { get; init; }
 
     /// <summary>欄位定義（key 為欄位名稱）</summary>
     public required IReadOnlyDictionary<string, FieldSchema> Fields { get; init; }

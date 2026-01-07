@@ -125,5 +125,5 @@ static async Task ExecuteCreateIndexAsync(string[] cmdArgs)
     }
 
     var command = new CreateIndexCommand();
-    await command.ExecuteAsync(connectionString, databaseName);
+    await CreateIndexCommand.ExecuteAsync(connectionString, databaseName);
 }
