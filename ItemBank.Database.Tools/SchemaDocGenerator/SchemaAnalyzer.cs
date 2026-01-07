@@ -4,6 +4,7 @@ using ItemBank.Database.Core.Schema.Attributes;
 using ItemBank.Database.Core.Schema.Interfaces;
 using ItemBank.Database.Tools.SchemaDocGenerator.Models;
 using ItemBank.Database.Tools.SchemaDocGenerator.TypeMappers;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ItemBank.Database.Tools.SchemaDocGenerator;
@@ -69,12 +70,13 @@ public sealed class SchemaAnalyzer
         foreach (var property in collectionType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             var fieldSchema = AnalyzeField(property);
-            fields[property.Name] = fieldSchema;
+            var fieldName = GetBsonFieldName(collectionType, property);
+            fields[fieldName] = fieldSchema;
 
             // 識別主鍵
             if (property.GetCustomAttribute<BsonIdAttribute>() != null)
             {
-                primaryKeys.Add(property.Name);
+                primaryKeys.Add(fieldName);
             }
         }
 
@@ -144,5 +146,37 @@ public sealed class SchemaAnalyzer
                 CollectEnumsFromFields((Dictionary<string, FieldSchema>)field.Fields);
             }
         }
+    }
+
+    /// <summary>
+    /// 取得欄位在 MongoDB 中的真實名稱（考慮 BsonElement 屬性和序列化規則）
+    /// </summary>
+    private static string GetBsonFieldName(Type declaringType, PropertyInfo property)
+    {
+        try
+        {
+            var classMap = BsonClassMap.LookupClassMap(declaringType);
+            var memberMap = classMap.GetMemberMap(property.Name);
+            if (memberMap != null)
+            {
+                return memberMap.ElementName;
+            }
+        }
+        catch
+        {
+            // 如果無法取得 ClassMap，使用 fallback
+        }
+
+        // Fallback: 使用 camelCase 轉換
+        return ToCamelCase(property.Name);
+    }
+
+    /// <summary>
+    /// 將字串轉換為 camelCase
+    /// </summary>
+    private static string ToCamelCase(string str)
+    {
+        if (string.IsNullOrEmpty(str) || char.IsLower(str[0])) return str;
+        return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
     }
 }

@@ -22,7 +22,34 @@
 **使用方式：**
 ```bash
 dotnet run --project ItemBank.Database.Tools -- schema-doc
+dotnet run --project ItemBank.Database.Tools -- schema-doc -f yaml -o schema.yaml
 ```
+
+---
+
+### 🔧 IndexCreator - 索引創建工具
+
+掃描所有實作 `IIndexable<T>` 的集合定義，並在 MongoDB 資料庫中創建對應的索引。
+
+**用途：**
+- 初始化新資料庫的索引
+- 補建遺失的索引
+- 更新索引定義
+
+**功能特點：**
+- 自動掃描所有 IIndexable 集合
+- 顯示詳細的執行進度
+- 統計成功/失敗數量
+- 支援自定義 MongoDB 連線
+
+**使用方式：**
+```bash
+dotnet run --project ItemBank.Database.Tools -- create-index -c "mongodb://localhost:27017" -d itembank
+```
+
+**參數說明：**
+- `-c, --connection <string>` - MongoDB 連線字串（必要）
+- `-d, --database <name>` - 資料庫名稱（必要）
 
 ---
 
@@ -73,8 +100,13 @@ dotnet run --project ItemBank.Database.Tools -- analyze-legacy --connection "mon
 ```
 ItemBank.Database.Tools/
 ├── SchemaDocGenerator/          # Schema 文件生成器
-│   ├── (待實作)
-│   └── SchemaDocGenerator.cs
+│   ├── Generators/
+│   ├── Models/
+│   ├── TypeMappers/
+│   ├── SchemaAnalyzer.cs
+│   └── SchemaDocCommand.cs
+├── IndexCreator/                # 索引創建工具
+│   └── CreateIndexCommand.cs
 ├── MigrationAnalyzer/           # 遷移資料分析
 │   ├── (待實作)
 │   ├── NewDbAnalyzer.cs        # 新總庫分析
@@ -106,9 +138,12 @@ ItemBank.Database.Tools/
 
 ## 開發狀態
 
-🚧 **目前為架構規劃階段，功能尚未實作**
+✅ **SchemaDocGenerator** - 已完成
+✅ **IndexCreator** - 已完成
+🚧 **MigrationAnalyzer** - 規劃中
 
 預計實作順序：
-1. SchemaDocGenerator - 優先實作，提供文件化支援
-2. NewDbAnalyzer - 新庫資料品質檢查
-3. LegacyDbAnalyzer - 舊庫遷移準備分析
+1. ✅ SchemaDocGenerator - 提供文件化支援
+2. ✅ IndexCreator - 索引管理工具
+3. 🚧 NewDbAnalyzer - 新庫資料品質檢查
+4. 🚧 LegacyDbAnalyzer - 舊庫遷移準備分析

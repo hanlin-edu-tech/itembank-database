@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="3.5.2" />
+    <PackageReference Include="Spectre.Console" Version="0.54.1-alpha.0.21" />
   </ItemGroup>
 
   <PropertyGroup>

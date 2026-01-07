@@ -213,8 +213,9 @@ public sealed class MongoTypeMapper
             {
                 var description = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
                 var fieldType = MapType(property.PropertyType, out var nestedFields, out var enumValues, out var idType, out var enumType, depth + 1);
+                var fieldName = GetBsonFieldName(type, property);
 
-                fields[property.Name] = new FieldSchema
+                fields[fieldName] = new FieldSchema
                 {
                     Type = fieldType,
                     Description = description,
@@ -255,5 +256,37 @@ public sealed class MongoTypeMapper
                (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) ||
                 type.GetGenericTypeDefinition() == typeof(IDictionary<,>) ||
                 type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>));
+    }
+
+    /// <summary>
+    /// 取得欄位在 MongoDB 中的真實名稱（考慮 BsonElement 屬性和序列化規則）
+    /// </summary>
+    private static string GetBsonFieldName(Type declaringType, PropertyInfo property)
+    {
+        try
+        {
+            var classMap = BsonClassMap.LookupClassMap(declaringType);
+            var memberMap = classMap.GetMemberMap(property.Name);
+            if (memberMap != null)
+            {
+                return memberMap.ElementName;
+            }
+        }
+        catch
+        {
+            // 如果無法取得 ClassMap，使用 fallback
+        }
+
+        // Fallback: 使用 camelCase 轉換
+        return ToCamelCase(property.Name);
+    }
+
+    /// <summary>
+    /// 將字串轉換為 camelCase
+    /// </summary>
+    private static string ToCamelCase(string str)
+    {
+        if (string.IsNullOrEmpty(str) || char.IsLower(str[0])) return str;
+        return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
     }
 }

@@ -1,4 +1,5 @@
 using ItemBank.Database.Tools.SchemaDocGenerator.Generators;
+using Spectre.Console;
 
 namespace ItemBank.Database.Tools.SchemaDocGenerator;
 
@@ -14,11 +15,21 @@ public sealed class SchemaDocCommand
     /// <param name="outputFile">輸出檔案路徑，若為 null 則輸出到 Console</param>
     public void Execute(string format, string? outputFile = null)
     {
+        AnsiConsole.Write(new Rule("[bold cyan]Schema 文件生成工具[/]").RuleStyle("cyan"));
+        AnsiConsole.WriteLine();
+
         // 分析所有集合
-        Console.WriteLine($"正在掃描集合定義...");
-        var analyzer = new SchemaAnalyzer();
-        var document = analyzer.AnalyzeCollections();
-        Console.WriteLine($"找到 {document.Collections.Count} 個集合, {document.Enums.Count} 個 Enum 定義");
+        Models.SchemaDocument document = null!;
+        AnsiConsole.Status()
+            .Spinner(Spinner.Known.Dots)
+            .Start("[yellow]正在掃描集合定義...[/]", ctx =>
+            {
+                var analyzer = new SchemaAnalyzer();
+                document = analyzer.AnalyzeCollections();
+            });
+
+        AnsiConsole.MarkupLine($"[dim]找到[/] [cyan]{document.Collections.Count}[/] [dim]個集合,[/] [cyan]{document.Enums.Count}[/] [dim]個 Enum 定義[/]");
+        AnsiConsole.WriteLine();
 
         // 選擇對應的生成器
         ISchemaDocGenerator generator = format.ToLowerInvariant() switch
@@ -29,17 +40,22 @@ public sealed class SchemaDocCommand
         };
 
         // 產生文件
-        Console.WriteLine($"正在生成 {format.ToUpperInvariant()} 格式文件...");
-        var output = generator.Generate(document);
+        string output = null!;
+        AnsiConsole.Status()
+            .Spinner(Spinner.Known.Dots)
+            .Start($"[yellow]正在生成 {format.ToUpperInvariant()} 格式文件...[/]", ctx =>
+            {
+                output = generator.Generate(document);
+            });
 
         // 輸出
         if (string.IsNullOrWhiteSpace(outputFile))
         {
             // 輸出到 Console
-            Console.WriteLine();
-            Console.WriteLine("=== 輸出結果 ===");
-            Console.WriteLine();
-            Console.WriteLine(output);
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule($"[bold]輸出結果 ({format.ToUpperInvariant()})[/]").LeftJustified());
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine(output);
         }
         else
         {
@@ -47,11 +63,20 @@ public sealed class SchemaDocCommand
             try
             {
                 File.WriteAllText(outputFile, output);
-                Console.WriteLine($"✓ 文件已成功寫入: {Path.GetFullPath(outputFile)}");
+                var fullPath = Path.GetFullPath(outputFile);
+
+                AnsiConsole.WriteLine();
+                var panel = new Panel($"[green]✓[/] 文件已成功寫入\n\n[dim]路徑:[/] [cyan]{fullPath}[/]\n[dim]格式:[/] [cyan]{format.ToUpperInvariant()}[/]\n[dim]大小:[/] [cyan]{new FileInfo(fullPath).Length:N0}[/] bytes")
+                    .Border(BoxBorder.Rounded)
+                    .BorderColor(Color.Green)
+                    .Header("[bold green]完成[/]");
+
+                AnsiConsole.Write(panel);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"✗ 寫入檔案失敗: {ex.Message}");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine($"[red]✗ 寫入檔案失敗:[/] {Markup.Escape(ex.Message)}");
                 throw;
             }
         }
