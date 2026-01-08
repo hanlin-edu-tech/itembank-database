@@ -53,12 +53,15 @@ public static class CreateIndexCommand
             // 為每個集合建立索引
             var results = new List<IndexCreationResult>();
 
+            var columns = new ProgressColumn[]
+            {
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new SpinnerColumn()
+            };
             await AnsiConsole.Progress()
-                .Columns(
-                    new TaskDescriptionColumn(),
-                    new ProgressBarColumn(),
-                    new PercentageColumn(),
-                    new SpinnerColumn())
+                .Columns(columns)
                 .StartAsync(async ctx =>
                 {
                     var task = ctx.AddTask("[cyan]建立索引中[/]", maxValue: indexableEntries.Length);

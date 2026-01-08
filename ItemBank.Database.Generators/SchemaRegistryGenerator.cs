@@ -543,7 +543,7 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
             var (isObsolete, obsoleteMessage) = GetObsoleteInfo(property, obsoleteAttributeSymbol);
             if (isObsolete)
             {
-                fieldName = $"{fieldName} (obsolte)";
+                fieldName = $"{fieldName} (obsolete)";
             }
 
             if (!string.IsNullOrWhiteSpace(obsoleteMessage))

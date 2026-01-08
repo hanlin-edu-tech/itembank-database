@@ -50,7 +50,7 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
             sb.AppendLine($"{indentStr}  indices:");
             foreach (var index in schema.Indices)
             {
-                sb.AppendLine($"{indentStr}    \"{EscapeYaml(index.Name)}\":");
+                sb.AppendLine($"{indentStr}    {index.Name}:");
                 if (index.Options.Any())
                 {
                     sb.AppendLine($"{indentStr}      options:");
@@ -64,7 +64,7 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
                     sb.AppendLine($"{indentStr}      fields:");
                     foreach (var field in index.Fields)
                     {
-                        sb.AppendLine($"{indentStr}        - field: {field.FieldName}");
+                        sb.AppendLine($"{indentStr}        {ToCamelCase(field.FieldName)}:");
                         sb.AppendLine($"{indentStr}          direction: {field.Direction}");
                     }
                 }
