@@ -26,7 +26,7 @@ public sealed class Dimension : IFinalizable, IAuditable, IIndexable<Dimension>
     public required string Name { get; init; }
 
     [Description("科目 Id 清單")]
-    public required List<SubjectId> SubjectIds { get; init; }
+    public required IReadOnlyList<SubjectId> SubjectIds { get; init; }
 
     [Description("是否已鎖定")]
     public bool IsFinalized { get; init; }

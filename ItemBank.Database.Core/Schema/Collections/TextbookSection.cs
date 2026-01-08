@@ -29,16 +29,16 @@ public class TextbookSection : IAuditable, IIndexable<TextbookSection>
     public required string Name { get; init; }
 
     [Description("段考範圍")]
-    public required List<string> TermTests { get; init; }
+    public required IReadOnlyList<string> TermTests { get; init; }
 
     [Description("備註")]
     public required string Description { get; init; }
 
     [Description("向度資訊 Id 清單")]
-    public required List<DimensionValueId> DimensionValueIds { get; init; }
+    public required IReadOnlyList<DimensionValueId> DimensionValueIds { get; init; }
 
     [Description("路徑")]
-    public required List<TextbookSectionId> Path { get; init; }
+    public required IReadOnlyList<TextbookSectionId> Path { get; init; }
 
     [Description("排序索引")]
     public required int OrderIndex { get; init; }

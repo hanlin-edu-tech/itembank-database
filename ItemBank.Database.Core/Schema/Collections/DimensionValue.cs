@@ -30,7 +30,7 @@ public class DimensionValue : IAuditable, IIndexable<DimensionValue>
     public required string Name { get; init; }
 
     [Description("路徑")]
-    public required List<DimensionValueId> Path { get; init; }
+    public required IReadOnlyList<DimensionValueId> Path { get; init; }
 
     [Description("作者")]
     public required UserId Author { get; init; }

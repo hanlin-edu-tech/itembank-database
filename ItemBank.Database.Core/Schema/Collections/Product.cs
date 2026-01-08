@@ -18,7 +18,7 @@ public sealed class Product : IIndexable<Product>
     public required string Name { get; init; }
 
     [Description("標籤清單")]
-    public required List<string> Tags { get; init; }
+    public required IReadOnlyList<string> Tags { get; init; }
 
     [Description("目的")]
     public required string Purpose { get; init; }
