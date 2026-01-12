@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace ItemBank.Database.Core.Schema.Collections;
 
 [CollectionName("CatalogGroups")]
-[Description("產品")]
+[Description("產品(目錄的產品)")]
 public sealed class CatalogGroup : IAuditable, IIndexable<CatalogGroup>
 {
     [BsonId]

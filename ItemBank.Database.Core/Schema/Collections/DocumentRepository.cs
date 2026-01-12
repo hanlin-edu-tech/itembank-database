@@ -40,7 +40,7 @@ public class DocumentRepository : IIndexable<DocumentRepository>
     [Description("第二階段")]
     public DocumentRepoStage? StageTwo { get; init; }
 
-    [Description("知識架構 Id")]
+    [Description("學程 Id")]
     public BodyOfKnowledgeId? BodyOfKnowledgeId { get; init; }
 
     [Description("標記題目數量記錄清單")]

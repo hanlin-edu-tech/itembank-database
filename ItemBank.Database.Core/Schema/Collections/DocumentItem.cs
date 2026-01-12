@@ -63,7 +63,7 @@ public class DocumentItem : IIndexable<DocumentItem>
 [Description("五欄檔案題目元資料")]
 public class DocumentItemMetadata
 {
-    [Description("元資料值 Id")]
+    [Description("元資料值 Id(就是 出處 及 題型)")]
     public required string MetadataValueId { get; init; }
 
     [Description("元資料類型")]
