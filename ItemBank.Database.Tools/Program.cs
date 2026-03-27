@@ -31,8 +31,8 @@ if (args.Length < 1)
     Console.WriteLine();
     Console.WriteLine("用法:");
     Console.WriteLine();
-    Console.WriteLine("  schema-doc [-f|--format yaml|md] [-o|--output <filename>]");
-    Console.WriteLine("    -f, --format <format>    輸出格式 (yaml|md)，預設：yaml");
+    Console.WriteLine("  schema-doc [-f|--format yaml|md|json] [-o|--output <filename>]");
+    Console.WriteLine("    -f, --format <format>    輸出格式 (yaml|md|json)，預設：yaml");
     Console.WriteLine("    -o, --output <filename>  輸出到檔案，若未指定則輸出到 Console");
     Console.WriteLine();
     Console.WriteLine("  create-index -c|--connection <connection-string> -d|--database <database-name>");

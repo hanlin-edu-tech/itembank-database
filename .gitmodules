@@ -1,0 +1,3 @@
+[submodule "itembank-database-query-with-ai"]
+	path = itembank-database-query-with-ai
+	url = git@github.com:hanlin-edu-tech/itembank-database-query-with-ai.git

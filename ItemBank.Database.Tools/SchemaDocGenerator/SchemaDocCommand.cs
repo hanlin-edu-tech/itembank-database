@@ -36,7 +36,8 @@ public sealed class SchemaDocCommand
         {
             "yaml" => new YamlSchemaGenerator(),
             "md" or "markdown" => new MarkdownSchemaGenerator(),
-            _ => throw new ArgumentException($"不支援的格式: {format}。支援的格式: yaml, md")
+            "json" => new JsonSchemaGenerator(),
+            _ => throw new ArgumentException($"不支援的格式: {format}。支援的格式: yaml, md, json")
         };
 
         // 產生文件

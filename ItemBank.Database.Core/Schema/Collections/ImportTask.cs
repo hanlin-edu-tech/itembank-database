@@ -58,10 +58,10 @@ public class ImportTask : IIndexable<ImportTask>
     public required DateTime? FinishedAt { get; init; }
 
     [Description("匯入日誌")]
-    public required TaskLog[] Logs { get; init; }
+    public required IReadOnlyList<TaskLog> Logs { get; init; }
 
     [Description("匯入題目")]
-    public required Item[] Items { get; init; }
+    public required IReadOnlyList<Item> Items { get; init; }
 
     static IReadOnlyList<CreateIndexModel<ImportTask>> IIndexable<ImportTask>.CreateIndexModelsWithoutDefault =>
     [
