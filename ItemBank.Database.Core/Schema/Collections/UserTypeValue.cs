@@ -20,6 +20,9 @@ public sealed class UserTypeValue : IAuditable, IIndexable<UserTypeValue>
     [Description("名稱")]
     public required string Name { get; init; }
 
+    [Description("代碼")]
+    public string? Code { get; init; }
+
     [Description("分組名稱")]
     public required string GroupingName { get; init; }
 
@@ -34,6 +37,9 @@ public sealed class UserTypeValue : IAuditable, IIndexable<UserTypeValue>
 
     [Description("備註")]
     public required string? Description { get; init; }
+
+    [Description("版權")]
+    public bool? Copyright { get; init; }
 
     [Description("排序索引")]
     public required int OrderIndex { get; init; }

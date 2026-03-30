@@ -45,6 +45,9 @@ public class ProductContent : IFinalizable, IAuditable, IIndexable<ProductConten
     [Description("版本 Id")]
     public required VersionId VersionId { get; init; }
 
+    [Description("版本名稱")]
+    public string? Version { get; init; }
+
     [Description("部門")]
     public required string Department { get; init; }
 

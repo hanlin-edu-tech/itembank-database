@@ -23,7 +23,18 @@ public sealed class JsonSchemaGenerator : ISchemaDocGenerator
                 c => new
                 {
                     description = c.Description,
-                    clrTypeName = c.ClrTypeName,
+                    kind = c.Kind,
+                    discriminator = c.Discriminator,
+                    variantField = c.VariantField,
+                    notes = c.Notes,
+                    variants = c.Variants.Select(v => new
+                    {
+                        name = v.Name,
+                        typeName = v.TypeName,
+                        description = v.Description,
+                        discriminatorValue = v.DiscriminatorValue
+                    }).ToList(),
+                    typeName = c.TypeName,
                     isAuditable = c.IsAuditable,
                     isFinalizable = c.IsFinalizable,
                     indices = c.Indices.Select(i => new

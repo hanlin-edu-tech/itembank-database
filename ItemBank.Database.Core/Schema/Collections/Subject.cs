@@ -20,6 +20,9 @@ public sealed class Subject : IIndexable<Subject>
     [Description("父科目 Id")]
     public required SubjectId? ParentSubjectId { get; init; }
 
+    [Description("是否封存")]
+    public bool? Archived { get; init; }
+
     [Description("教育代碼")]
     public required string EducationCode { get; init; }
 
@@ -37,4 +40,7 @@ public sealed class Subject : IIndexable<Subject>
 
     [Description("領域")]
     public required string Area { get; init; }
+
+    [Description("建立時間")]
+    public DateTime? CreatedAt { get; init; }
 }

@@ -11,8 +11,23 @@ public sealed record CollectionSchema
     /// <summary>集合描述</summary>
     public required string Description { get; init; }
 
-    /// <summary>C# 類別名稱</summary>
-    public required string ClrTypeName { get; init; }
+    /// <summary>集合建模種類</summary>
+    public required string Kind { get; init; }
+
+    /// <summary>判別欄位</summary>
+    public string? Discriminator { get; init; }
+
+    /// <summary>變動欄位</summary>
+    public string? VariantField { get; init; }
+
+    /// <summary>額外說明</summary>
+    public required IReadOnlyList<string> Notes { get; init; }
+
+    /// <summary>已建模的變體清單</summary>
+    public required IReadOnlyList<CollectionVariantSchema> Variants { get; init; }
+
+    /// <summary>型別名稱</summary>
+    public required string TypeName { get; init; }
 
     /// <summary>是否實作 IAuditable 介面</summary>
     public required bool IsAuditable { get; init; }

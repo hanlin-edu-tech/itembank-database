@@ -16,6 +16,11 @@ public enum EnumSerializationType
     PascalCase,
 
     /// <summary>
+    /// 序列化為 snake_case 字串
+    /// </summary>
+    SnakeCase,
+
+    /// <summary>
     /// 序列化為整數
     /// </summary>
     Integer

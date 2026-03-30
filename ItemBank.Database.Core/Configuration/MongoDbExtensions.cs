@@ -69,6 +69,10 @@ public static class MongoDbExtensions
         BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<DocumentRepoId>());
         BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ItemIssueId>());
         BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ValidationTargetId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<PromptId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ItemShellId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ContentId>());
+        BsonSerializer.RegisterSerializer(new StringBasedIdSerializer<ContentSectionId>());
 
         // 註冊 ObjectId-based Id 序列化器
         BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ItemYearDimensionValueId>());
@@ -79,17 +83,29 @@ public static class MongoDbExtensions
         BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<UserConversationId>());
         BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ConversationMessageId>());
         BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<PackageId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<GeneratedItemId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<GeneratedImageId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<SemanticCacheId>());
+        BsonSerializer.RegisterSerializer(new ObjectIdBasedIdSerializer<ItemImageDuplicateMatchId>());
 
         // 註冊 Enum Serializer
         BsonSerializer.RegisterSerializer(new EnumSerializer<DimensionType>(EnumSerializationType.CamelCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<ExportType>(EnumSerializationType.PascalCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<ExportArchiveMode>(EnumSerializationType.PascalCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<BatchProcessingStatus>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<AIGenerationTaskStatus>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<AIGenerationPromptType>(EnumSerializationType.CamelCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<ConversationRole>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ChatBotAiResultCacheType>(EnumSerializationType.PascalCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<GeneratedImageType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<GeneratedItemStatus>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<ItemImageJobStatus>(EnumSerializationType.PascalCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<MetadataType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<OnlineReadinessStatus>(EnumSerializationType.SnakeCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<ProcessingType>(EnumSerializationType.CamelCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<CopyrightType>(EnumSerializationType.Integer));
         BsonSerializer.RegisterSerializer(new EnumSerializer<UsageType>(EnumSerializationType.CamelCase));
+        BsonSerializer.RegisterSerializer(new EnumSerializer<WordExportStatus>(EnumSerializationType.CamelCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<TermEnum>(EnumSerializationType.PascalCase));
         BsonSerializer.RegisterSerializer(new EnumSerializer<SemesterEnum>(EnumSerializationType.PascalCase));
 

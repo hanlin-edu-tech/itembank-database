@@ -66,6 +66,10 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
                 context.Writer.WriteString(value.ToString());
                 break;
 
+            case EnumSerializationType.SnakeCase:
+                context.Writer.WriteString(ToSnakeCase(value.ToString()));
+                break;
+
             default:
                 throw new BsonSerializationException(
                     $"Unsupported serialization type '{serializationType}'."
@@ -78,6 +82,26 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
         if (string.IsNullOrEmpty(str) || char.IsLower(str[0])) return str;
 
         return $"{char.ToLowerInvariant(str[0])}{str[1..]}";
+    }
+
+    private static string ToSnakeCase(string str)
+    {
+        if (string.IsNullOrEmpty(str)) return str;
+
+        var chars = new List<char>(str.Length + 8);
+
+        for (var i = 0; i < str.Length; i++)
+        {
+            var current = str[i];
+            if (char.IsUpper(current) && i > 0)
+            {
+                chars.Add('_');
+            }
+
+            chars.Add(char.ToLowerInvariant(current));
+        }
+
+        return new string(chars.ToArray());
     }
 
     /// <summary>
@@ -116,6 +140,7 @@ public sealed class EnumSerializer<TEnum>(EnumSerializationType serializationTyp
             EnumSerializationType.Integer => Convert.ToInt32(value).ToString(),
             EnumSerializationType.CamelCase => ToCamelCase(value.ToString()),
             EnumSerializationType.PascalCase => value.ToString(),
+            EnumSerializationType.SnakeCase => ToSnakeCase(value.ToString()),
             _ => value.ToString()
         };
     }

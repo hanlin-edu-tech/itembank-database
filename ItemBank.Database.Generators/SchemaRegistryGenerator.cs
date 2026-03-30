@@ -22,12 +22,24 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
 
         var collectionNameAttributeSymbol = compilation.GetTypeByMetadataName(
             "ItemBank.Database.Core.Schema.Attributes.CollectionNameAttribute");
+        var collectionSchemaKindAttributeSymbol = compilation.GetTypeByMetadataName(
+            "ItemBank.Database.Core.Schema.Attributes.CollectionSchemaKindAttribute");
+        var collectionSchemaDiscriminatorAttributeSymbol = compilation.GetTypeByMetadataName(
+            "ItemBank.Database.Core.Schema.Attributes.CollectionSchemaDiscriminatorAttribute");
+        var collectionSchemaVariantFieldAttributeSymbol = compilation.GetTypeByMetadataName(
+            "ItemBank.Database.Core.Schema.Attributes.CollectionSchemaVariantFieldAttribute");
+        var collectionSchemaNoteAttributeSymbol = compilation.GetTypeByMetadataName(
+            "ItemBank.Database.Core.Schema.Attributes.CollectionSchemaNoteAttribute");
         var descriptionAttributeSymbol = compilation.GetTypeByMetadataName(
             "System.ComponentModel.DescriptionAttribute");
         var obsoleteAttributeSymbol = compilation.GetTypeByMetadataName(
             "System.ObsoleteAttribute");
         var bsonIdAttributeSymbol = compilation.GetTypeByMetadataName(
             "MongoDB.Bson.Serialization.Attributes.BsonIdAttribute");
+        var bsonDiscriminatorAttributeSymbol = compilation.GetTypeByMetadataName(
+            "MongoDB.Bson.Serialization.Attributes.BsonDiscriminatorAttribute");
+        var bsonKnownTypesAttributeSymbol = compilation.GetTypeByMetadataName(
+            "MongoDB.Bson.Serialization.Attributes.BsonKnownTypesAttribute");
         var iAuditableSymbol = compilation.GetTypeByMetadataName(
             "ItemBank.Database.Core.Schema.Interfaces.IAuditable");
         var iFinalizableSymbol = compilation.GetTypeByMetadataName(
@@ -57,9 +69,15 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         }.Where(symbol => symbol is not null).Cast<INamedTypeSymbol>().ToImmutableArray();
 
         if (collectionNameAttributeSymbol is null ||
+            collectionSchemaKindAttributeSymbol is null ||
+            collectionSchemaDiscriminatorAttributeSymbol is null ||
+            collectionSchemaVariantFieldAttributeSymbol is null ||
+            collectionSchemaNoteAttributeSymbol is null ||
             descriptionAttributeSymbol is null ||
             obsoleteAttributeSymbol is null ||
             bsonIdAttributeSymbol is null ||
+            bsonDiscriminatorAttributeSymbol is null ||
+            bsonKnownTypesAttributeSymbol is null ||
             iAuditableSymbol is null ||
             iFinalizableSymbol is null ||
             iIndexableSymbol is null ||
@@ -101,6 +119,9 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         var collectionMethodMap = collectionTypes.ToDictionary(
             type => type,
             type => GenerateCollectionMethod(type, processedTypes, collectionNameAttributeSymbol,
+                collectionSchemaKindAttributeSymbol, collectionSchemaDiscriminatorAttributeSymbol,
+                collectionSchemaVariantFieldAttributeSymbol, collectionSchemaNoteAttributeSymbol,
+                bsonDiscriminatorAttributeSymbol, bsonKnownTypesAttributeSymbol,
                 descriptionAttributeSymbol, iAuditableSymbol, iFinalizableSymbol, iIndexableSymbol),
             SymbolEqualityComparer.Default);
 
@@ -429,6 +450,12 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         INamedTypeSymbol typeSymbol,
         Dictionary<INamedTypeSymbol, TypeDescriptor> typeMap,
         INamedTypeSymbol collectionNameAttributeSymbol,
+        INamedTypeSymbol collectionSchemaKindAttributeSymbol,
+        INamedTypeSymbol collectionSchemaDiscriminatorAttributeSymbol,
+        INamedTypeSymbol collectionSchemaVariantFieldAttributeSymbol,
+        INamedTypeSymbol collectionSchemaNoteAttributeSymbol,
+        INamedTypeSymbol bsonDiscriminatorAttributeSymbol,
+        INamedTypeSymbol bsonKnownTypesAttributeSymbol,
         INamedTypeSymbol descriptionAttributeSymbol,
         INamedTypeSymbol iAuditableSymbol,
         INamedTypeSymbol iFinalizableSymbol,
@@ -439,6 +466,11 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         var fieldsMethod = typeMap[typeSymbol].MethodName;
         var collectionName = GetCollectionName(typeSymbol, collectionNameAttributeSymbol) ?? typeSymbol.Name;
         var description = GetDescription(typeSymbol, descriptionAttributeSymbol);
+        var kind = GetCollectionSchemaKind(typeSymbol, collectionSchemaKindAttributeSymbol);
+        var discriminator = GetSingleStringAttributeValue(typeSymbol, collectionSchemaDiscriminatorAttributeSymbol, "FieldName");
+        var variantField = GetSingleStringAttributeValue(typeSymbol, collectionSchemaVariantFieldAttributeSymbol, "FieldName");
+        var notes = GetRepeatedStringAttributeValues(typeSymbol, collectionSchemaNoteAttributeSymbol, "Note");
+        var variants = BuildCollectionVariants(typeSymbol, descriptionAttributeSymbol, bsonDiscriminatorAttributeSymbol, bsonKnownTypesAttributeSymbol);
         var clrTypeName = typeSymbol.Name;
         var isAuditable = ImplementsInterface(typeSymbol, iAuditableSymbol);
         var isFinalizable = ImplementsInterface(typeSymbol, iFinalizableSymbol);
@@ -447,6 +479,10 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         var indicesExpression = ImplementsInterface(typeSymbol, iIndexableSymbol)
             ? $"BuildIndices<{typeDisplay}>()"
             : "global::System.Array.Empty<global::ItemBank.Database.Tools.SchemaDocGenerator.Models.IndexSchema>()";
+        var notesExpression = BuildStringArrayExpression(notes);
+        var variantsExpression = BuildVariantsExpression(variants);
+        var discriminatorExpression = discriminator is null ? "null" : $"\"{EscapeStringLiteral(discriminator)}\"";
+        var variantFieldExpression = variantField is null ? "null" : $"\"{EscapeStringLiteral(variantField)}\"";
 
         return $$"""
                          private static global::ItemBank.Database.Tools.SchemaDocGenerator.Models.CollectionSchema {{methodName}}()
@@ -455,8 +491,13 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
                              {
                                  CollectionName = "{{EscapeStringLiteral(collectionName)}}",
                                  Description = "{{EscapeStringLiteral(description)}}",
-                                 ClrTypeName = "{{EscapeStringLiteral(clrTypeName)}}",
-                                 IsAuditable = {{isAuditable.ToString().ToLowerInvariant()}},
+                                  Kind = "{{EscapeStringLiteral(kind)}}",
+                                  Discriminator = {{discriminatorExpression}},
+                                  VariantField = {{variantFieldExpression}},
+                                  Notes = {{notesExpression}},
+                                  Variants = {{variantsExpression}},
+                                  TypeName = "{{EscapeStringLiteral(clrTypeName)}}",
+                                  IsAuditable = {{isAuditable.ToString().ToLowerInvariant()}},
                                  IsFinalizable = {{isFinalizable.ToString().ToLowerInvariant()}},
                                  Indices = {{indicesExpression}},
                                  Fields = {{fieldsMethod}}()
@@ -775,6 +816,167 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
             SymbolEqualityComparer.Default.Equals(attr.AttributeClass, attributeSymbol));
     }
 
+    private static string GetCollectionSchemaKind(INamedTypeSymbol symbol, INamedTypeSymbol attributeSymbol)
+    {
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeSymbol))
+                continue;
+
+            if (attribute.ConstructorArguments.Length > 0 && attribute.ConstructorArguments[0].Value is int enumValue)
+            {
+                return enumValue switch
+                {
+                    1 => "discriminated_collection",
+                    2 => "enveloped_collection",
+                    3 => "flexible_collection",
+                    _ => "regular_collection"
+                };
+            }
+        }
+
+        return "regular_collection";
+    }
+
+    private static string? GetSingleStringAttributeValue(INamedTypeSymbol symbol, INamedTypeSymbol attributeSymbol, string propertyName)
+    {
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeSymbol))
+                continue;
+
+            if (attribute.ConstructorArguments.Length > 0 && attribute.ConstructorArguments[0].Value is string ctorValue)
+                return ctorValue;
+
+            foreach (var named in attribute.NamedArguments)
+            {
+                if (named.Key == propertyName && named.Value.Value is string namedValue)
+                    return namedValue;
+            }
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<string> GetRepeatedStringAttributeValues(INamedTypeSymbol symbol, INamedTypeSymbol attributeSymbol, string propertyName)
+    {
+        var result = new List<string>();
+
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeSymbol))
+                continue;
+
+            if (attribute.ConstructorArguments.Length > 0 && attribute.ConstructorArguments[0].Value is string ctorValue)
+            {
+                result.Add(ctorValue);
+                continue;
+            }
+
+            foreach (var named in attribute.NamedArguments)
+            {
+                if (named.Key == propertyName && named.Value.Value is string namedValue)
+                {
+                    result.Add(namedValue);
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static IReadOnlyList<CollectionVariantDescriptor> BuildCollectionVariants(
+        INamedTypeSymbol symbol,
+        INamedTypeSymbol descriptionAttributeSymbol,
+        INamedTypeSymbol bsonDiscriminatorAttributeSymbol,
+        INamedTypeSymbol bsonKnownTypesAttributeSymbol)
+    {
+        var result = new List<CollectionVariantDescriptor>();
+
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, bsonKnownTypesAttributeSymbol))
+                continue;
+
+            foreach (var arg in attribute.ConstructorArguments)
+            {
+                if (arg.Kind == TypedConstantKind.Array)
+                {
+                    foreach (var value in arg.Values)
+                    {
+                        if (value.Value is INamedTypeSymbol variantType)
+                        {
+                            result.Add(CreateVariantDescriptor(variantType, descriptionAttributeSymbol, bsonDiscriminatorAttributeSymbol));
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (arg.Value is INamedTypeSymbol directVariantType)
+                {
+                    result.Add(CreateVariantDescriptor(directVariantType, descriptionAttributeSymbol, bsonDiscriminatorAttributeSymbol));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static CollectionVariantDescriptor CreateVariantDescriptor(
+        INamedTypeSymbol symbol,
+        INamedTypeSymbol descriptionAttributeSymbol,
+        INamedTypeSymbol bsonDiscriminatorAttributeSymbol)
+    {
+        return new CollectionVariantDescriptor(
+            symbol.Name,
+            symbol.Name,
+            GetDescription(symbol, descriptionAttributeSymbol),
+            GetBsonDiscriminatorValue(symbol, bsonDiscriminatorAttributeSymbol));
+    }
+
+    private static string? GetBsonDiscriminatorValue(INamedTypeSymbol symbol, INamedTypeSymbol attributeSymbol)
+    {
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeSymbol))
+                continue;
+
+            if (attribute.ConstructorArguments.Length > 0 && attribute.ConstructorArguments[0].Value is string ctorValue)
+                return ctorValue;
+        }
+
+        return symbol.Name;
+    }
+
+    private static string BuildStringArrayExpression(IReadOnlyList<string> values)
+    {
+        if (values.Count == 0)
+            return "global::System.Array.Empty<string>()";
+
+        var items = string.Join(", ", values.Select(value => $"\"{EscapeStringLiteral(value)}\""));
+        return $"new string[] {{ {items} }}";
+    }
+
+    private static string BuildVariantsExpression(IReadOnlyList<CollectionVariantDescriptor> variants)
+    {
+        if (variants.Count == 0)
+            return "global::System.Array.Empty<global::ItemBank.Database.Tools.SchemaDocGenerator.Models.CollectionVariantSchema>()";
+
+        var items = variants.Select(variant =>
+            "new global::ItemBank.Database.Tools.SchemaDocGenerator.Models.CollectionVariantSchema { " +
+            $"Name = \"{EscapeStringLiteral(variant.Name)}\", " +
+            $"TypeName = \"{EscapeStringLiteral(variant.ClrTypeName)}\", " +
+            $"Description = \"{EscapeStringLiteral(variant.Description)}\", " +
+            (variant.DiscriminatorValue is null
+                ? "DiscriminatorValue = null"
+                : $"DiscriminatorValue = \"{EscapeStringLiteral(variant.DiscriminatorValue)}\"") +
+            " }");
+
+        return "new global::ItemBank.Database.Tools.SchemaDocGenerator.Models.CollectionVariantSchema[] { " + string.Join(", ", items) + " }";
+    }
+
     private static string? GetCollectionName(INamedTypeSymbol typeSymbol, INamedTypeSymbol attributeSymbol)
     {
         foreach (var attribute in typeSymbol.GetAttributes())
@@ -947,6 +1149,25 @@ public sealed class SchemaRegistryGenerator : IIncrementalGenerator
         public string MethodName { get; }
 
         public IReadOnlyList<FieldDescriptor> Fields { get; }
+    }
+
+    private sealed class CollectionVariantDescriptor
+    {
+        public CollectionVariantDescriptor(string name, string clrTypeName, string description, string? discriminatorValue)
+        {
+            Name = name;
+            ClrTypeName = clrTypeName;
+            Description = description;
+            DiscriminatorValue = discriminatorValue;
+        }
+
+        public string Name { get; }
+
+        public string ClrTypeName { get; }
+
+        public string Description { get; }
+
+        public string? DiscriminatorValue { get; }
     }
 
     private sealed class FieldDescriptor

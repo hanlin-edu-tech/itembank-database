@@ -20,6 +20,9 @@ public sealed class SourceValue : IAuditable, IIndexable<SourceValue>
     [Description("名稱")]
     public required string Name { get; init; }
 
+    [Description("代碼")]
+    public string? Code { get; init; }
+
     [Description("版權")]
     public required bool Copyright { get; init; }
 

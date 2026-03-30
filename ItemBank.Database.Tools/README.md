@@ -53,6 +53,49 @@ dotnet run --project ItemBank.Database.Tools -- create-index -c "mongodb://local
 
 ---
 
+### 🧾 DbSchemaExtractor - 資料庫 Schema 事實擷取工具
+
+從既有 MongoDB 資料庫抽取 collection、欄位結構與 index 事實，輸出為 JSON，供 AI 與現有 C# schema 交叉比對後再修改 C#。
+
+**用途：**
+- 反向推導既有資料庫結構
+- 輔助 AI 與現有 C# schema 比對
+- 產出可審查的 JSON 事實檔
+
+**輸出內容：**
+- collection 名稱
+- estimated document count
+- 抽樣文件的欄位結構
+- nullable / missing / null 觀察統計
+- array/object 巢狀結構
+- index 定義與選項
+
+**欄位統計重點：**
+- `presenceRate`：欄位在觀察樣本中的出現比例
+- `nullRate`：欄位已出現時，值為 `null` 的比例
+- `typeCounts`：各 BSON 型別的觀察次數
+- `arrayElementTypeCounts`：array 元素各 BSON 型別的觀察次數
+- `observationScope`：統計口徑，`document` 表示以文件為單位，`arrayElement` 表示以陣列元素物件為單位
+
+**注意事項：**
+- 本工具輸出的是資料庫結構事實，不直接推論 enum、強型別 Id 或業務介面。
+- `arrayObjectFields` 內的欄位統計口徑為 `arrayElement`，不可直接等同於 collection 文件層級的出現率。
+
+**使用方式：**
+```bash
+dotnet run --project ItemBank.Database.Tools -- extract-db-schema -c "mongodb://localhost:27017" -d itembank -o schema-facts.json
+dotnet run --project ItemBank.Database.Tools -- extract-db-schema -c "mongodb://localhost:27017" -d itembank --sample-size 200 --collections Items,Questions
+```
+
+**參數說明：**
+- `-c, --connection <string>` - MongoDB 連線字串（必要）
+- `-d, --database <name>` - 資料庫名稱（必要）
+- `-o, --output <filename>` - JSON 輸出檔案；若未指定則輸出到 Console
+- `--sample-size <count>` - 每個 collection 的抽樣文件數，預設 `100`
+- `--collections <name1,name2,...>` - 僅擷取指定 collection，使用逗號分隔
+
+---
+
 ### 🔍 MigrationAnalyzer - 遷移資料分析工具
 
 掃描新舊資料庫，比對資料一致性，協助遷移前的資料分析。
@@ -107,6 +150,11 @@ ItemBank.Database.Tools/
 │   └── SchemaDocCommand.cs
 ├── IndexCreator/                # 索引創建工具
 │   └── CreateIndexCommand.cs
+├── DbSchemaExtractor/           # 資料庫 Schema 事實擷取
+│   ├── Models/
+│   ├── DbSchemaExtractor.cs
+│   ├── ExtractDbSchemaCommand.cs
+│   └── FieldAccumulator.cs
 ├── MigrationAnalyzer/           # 遷移資料分析
 │   ├── (待實作)
 │   ├── NewDbAnalyzer.cs        # 新總庫分析
@@ -140,10 +188,12 @@ ItemBank.Database.Tools/
 
 ✅ **SchemaDocGenerator** - 已完成
 ✅ **IndexCreator** - 已完成
+✅ **DbSchemaExtractor** - 已完成
 🚧 **MigrationAnalyzer** - 規劃中
 
 預計實作順序：
 1. ✅ SchemaDocGenerator - 提供文件化支援
 2. ✅ IndexCreator - 索引管理工具
-3. 🚧 NewDbAnalyzer - 新庫資料品質檢查
-4. 🚧 LegacyDbAnalyzer - 舊庫遷移準備分析
+3. ✅ DbSchemaExtractor - 資料庫 Schema 事實擷取
+4. 🚧 NewDbAnalyzer - 新庫資料品質檢查
+5. 🚧 LegacyDbAnalyzer - 舊庫遷移準備分析

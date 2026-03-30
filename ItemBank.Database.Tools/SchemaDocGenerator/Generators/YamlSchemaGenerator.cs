@@ -43,6 +43,41 @@ public sealed class YamlSchemaGenerator : ISchemaDocGenerator
 
         sb.AppendLine($"{indentStr}{schema.CollectionName}:");
         sb.AppendLine($"{indentStr}  description: \"{EscapeYaml(schema.Description)}\"");
+        sb.AppendLine($"{indentStr}  kind: {schema.Kind}");
+
+        if (!string.IsNullOrWhiteSpace(schema.Discriminator))
+        {
+            sb.AppendLine($"{indentStr}  discriminator: {schema.Discriminator}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(schema.VariantField))
+        {
+            sb.AppendLine($"{indentStr}  variant_field: {schema.VariantField}");
+        }
+
+        if (schema.Notes.Any())
+        {
+            sb.AppendLine($"{indentStr}  notes:");
+            foreach (var note in schema.Notes)
+            {
+                sb.AppendLine($"{indentStr}    - \"{EscapeYaml(note)}\"");
+            }
+        }
+
+        if (schema.Variants.Any())
+        {
+            sb.AppendLine($"{indentStr}  variants:");
+            foreach (var variant in schema.Variants)
+            {
+                sb.AppendLine($"{indentStr}    {variant.Name}:");
+                sb.AppendLine($"{indentStr}      type_name: {variant.TypeName}");
+                sb.AppendLine($"{indentStr}      description: \"{EscapeYaml(variant.Description)}\"");
+                if (!string.IsNullOrWhiteSpace(variant.DiscriminatorValue))
+                {
+                    sb.AppendLine($"{indentStr}      discriminator_value: {variant.DiscriminatorValue}");
+                }
+            }
+        }
 
         // Indices
         if (schema.Indices.Any())
